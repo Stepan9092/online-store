@@ -1,4 +1,4 @@
 import './index.html';
-import './styles/style.scss';
+import './index.scss';
 
 console.log('start');
