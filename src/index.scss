@@ -161,6 +161,42 @@
             min-width: 190px;
             height: 350px;
             border: 1px solid black;
+
+            .item__image {
+                width: 100%;
+                height: 70%;
+                background-image: url(./assets/products/test/thumbnail.jpg);
+                background-repeat: no-repeat;
+                background-size: contain;
+                background-position: center;
+            }
+
+            .item__info-block {
+                .info__caption {
+                    margin: 0 0 0 5px;
+                    color: #0F1111;
+                    font-size: 16px;
+                    line-height: 24px;
+                    font-weight: 400;
+                    font-style: normal;
+                }
+
+                .info__block {
+                    .info__block-left {
+                        .info__rating {
+                            margin: 5px 0 5px 5px;
+                        }
+
+                        .info__price {
+                            margin: 5px 0 5px 5px;
+                        }
+                    }
+
+                    .info__block-right {
+
+                    }
+                }
+            }
         }
     }
 }
