@@ -1,5 +1,15 @@
 @import '~normalize.css';
 
+@font-face {
+    font-family: 'Amazon Ember';
+    src: url("./assets/fonts/AmazonEmber_Rg.ttf"); 
+}
+
+@font-face {
+    font-family: 'Amazon Ember Light';
+    src: url("./assets/fonts/AmazonEmber_Lt.ttf"); 
+}
+
 .main-wrapper {
     width:  80%;
     height: 1000px;
@@ -21,8 +31,9 @@
         }
 
         .filter {
+
             .filter__caption{
-                font-family: Arial, Helvetica, sans-serif;
+                //font-family: Arial, Helvetica, sans-serif;
                 font-size: 14px;
                 font-weight: 700;
                 line-height: 16px;
@@ -34,7 +45,7 @@
                 margin: 10px 5px;
                 padding: 0;
 
-                overflow-y:auto;
+                overflow-y: auto;
 
                 li {
                     display: flex;
@@ -151,6 +162,8 @@
         padding: 0;
         //background-color: aquamarine;
 
+        font-family: 'Amazon Ember';
+
         display: flex;
         flex-wrap: wrap;
         gap: 2%;
@@ -160,7 +173,7 @@
             width: 23%;
             min-width: 190px;
             height: 350px;
-            border: 1px solid black;
+            //border: 1px solid black;
 
             .item__image {
                 width: 100%;
@@ -182,18 +195,75 @@
                 }
 
                 .info__block {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items:  center;
+
                     .info__block-left {
+                        flex-grow:1;
+
                         .info__rating {
                             margin: 5px 0 5px 5px;
+
+                            .rating__star{
+
+                            }
+
+                            .rating__value{
+
+                            }
+
+                            .rating__stock{
+                                font-size: 14px;
+                                line-height: 20px;
+                                color: #007185;
+                            }
                         }
 
                         .info__price {
                             margin: 5px 0 5px 5px;
+
+                            .price__currency {
+                                position: relative;
+                                top: -0.75em;
+                                font-size: 13px;
+                            }
+
+                            .price__value {
+                                font-size: 28px;
+
+                                span {
+                                    position: relative;
+                                    top: -0.75em;
+                                    font-size: 13px;
+                                }
+                            }
+
+                            .price__discont {
+                                color: #565959;
+                                font-size: 13px;
+                                text-decoration: line-through;
+                            }
                         }
                     }
 
                     .info__block-right {
+                        flex-grow:1;
 
+                        .add-to-cart_control {
+                            width: 32px;
+                            height: 32px;
+                            background: url('./assets/cart.png');
+                            background-position: center;
+                            background-repeat: no-repeat;
+                            background-size: cover;
+
+                            transition: all 0.1s linear;
+
+                            &:hover {
+                                transform: scale(1.2);
+                            }
+                        }
                     }
                 }
             }
