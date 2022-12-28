@@ -32,6 +32,16 @@ class Model {
   run(): void {
     console.log('model run');
   }
+
+  getFilterItems(filterName: string): Set<string> {
+    const items = new Set<string>();
+    this.prodBase.products.forEach((item: IProduct) => {
+      // console.log(item[filterName as keyof typeof item]);
+      items.add(String(item[filterName as keyof typeof item]));
+    });
+    console.log(filterName);
+    return items;
+  }
 }
 
 export default Model;
