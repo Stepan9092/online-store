@@ -1,4 +1,6 @@
 import './index.html';
 import './index.scss';
+import Header from './components/header/header';
 
-console.log('start');
+const header = new Header();
+console.log(header);
