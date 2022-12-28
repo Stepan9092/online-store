@@ -25,7 +25,8 @@ class Model {
   private prodBase: IProducts;
 
   constructor() {
-    console.log('model constructor', prodBase);
+    this.prodBase = base;
+    console.log('model constructor', this.prodBase);
   }
 
   run(): void {
