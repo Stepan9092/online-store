@@ -19,6 +19,17 @@ class Model {
     });
     return items;
   }
+
+  getItems(): IProducts {
+    // title
+    // manufacturer
+    // rating
+    // stock
+    // price
+    // discountPercentage
+
+    return this.prodBase;
+  }
 }
 
 export default Model;
