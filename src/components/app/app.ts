@@ -1,5 +1,5 @@
 import Model from '../model/model';
-import ViewMain from '../view/main/main';
+import ViewMain from '../view/main/index';
 
 class App {
   private model: Model;
@@ -10,18 +10,14 @@ class App {
     this.mainPage = new ViewMain();
   }
 
-  run() {
-    console.log('App run');
+  run(): void {
+    // console.log('App run');
 
-    this.model.run();
+    // this.model.run();
+    this.mainPage.render(this.model);
 
-    const filterItemsBrand: Array<string> = Array.from(
-      this.model.getFilterItems('manufacturer').values()
-    );
-
-    console.log(filterItemsBrand);
-
-    this.mainPage.render();
+    // fill category
+    // this.mainPage.fillFilter(this.model);
   }
 }
 
