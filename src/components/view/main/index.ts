@@ -37,30 +37,93 @@ class ViewMain {
   }
 
   // Заполнение заданной категории фильтров.
-  private fillFilterItem(filterClass: string, filterItemsBrand: Array<string>): void {
+  private fillFilterItem(
+    filterClass: string,
+    filterItemsBrand: Array<string>,
+    filterCategoty?: string,
+    model?: Model
+  ): void {
     const filter: HTMLElement | null = document.querySelector(filterClass);
 
-    if (filter) {
+    if (filter !== undefined && filterCategoty !== undefined) {
       const filterList: HTMLElement = createElement('ul', 'filter__items', filter);
 
       filterItemsBrand.forEach((item) => {
         const filterItem: HTMLElement = createElement('li', '', filterList);
-        createElement('input', '', filterItem, ['type', 'checkbox'], ['id', item], ['name', item]);
+        const input = createElement(
+          'input',
+          '',
+          filterItem,
+          ['type', 'checkbox'],
+          ['id', item],
+          ['name', item]
+        );
+        input.setAttribute('data-category', filterCategoty);
+
+        input.addEventListener('change', (event) => {
+          const target: HTMLInputElement = event.target as HTMLInputElement;
+
+          if (target) {
+            // console.log(
+            //   target.getAttribute('name'),
+            //   ' / ',
+            //   target.getAttribute('data-category'),
+            //   ' ',
+            //   target.checked
+            // );\
+            const category: string | null = target.getAttribute('data-category');
+            const name: string | null = target.getAttribute('name');
+            if (model !== undefined) {
+              if (category !== null && name !== null) {
+                model.changeFilter(category, name, target.checked);
+                // this.render(model);
+                const productsBlock: HTMLElement | null = document.querySelector('.main__products');
+                if (productsBlock !== null) {
+                  productsBlock.innerHTML = ''; // ПЕРЕДЕЛАТЬ.
+                  this.createProductsBlock(productsBlock, model);
+                }
+              }
+            }
+          }
+        });
+
         const itemLabel = createElement('label', '', filterItem, ['for', item]);
         createElement('span', '', itemLabel).textContent = item;
-        createElement('span', '', itemLabel).textContent = '(0/0)';
+
+        if (filterCategoty !== undefined && model !== undefined) {
+          // console.log(item, filterCategoty, model.getCategoryItemsCount(filterCategoty, item));
+          const filterCount = `(${model.getCategoryItemsCount(
+            filterCategoty,
+            item
+          )}/${model.getItemsCount()})`;
+          createElement('span', '', itemLabel).textContent = filterCount;
+        } else {
+          createElement('span', '', itemLabel).textContent = '(0/0)';
+        }
       });
     }
   }
 
   // Заполнение всех категорий фильтров.
   private fillFilter(model: Model): void {
-    this.fillFilterItem('.filter__categry', Array.from(model.getFilterItems('category').values()));
+    this.fillFilterItem(
+      '.filter__categry',
+      Array.from(model.getFilterItems('category').values()),
+      'category',
+      model
+    );
     this.fillFilterItem(
       '.filter__brand',
-      Array.from(model.getFilterItems('manufacturer').values())
+      Array.from(model.getFilterItems('manufacturer').values()),
+      'manufacturer',
+      model
     );
-    this.fillFilterItem('.filter__sex', Array.from(model.getFilterItems('gender').values()));
+    this.fillFilterItem(
+      '.filter__sex',
+      Array.from(model.getFilterItems('gender').values()),
+      'gender',
+      model
+    );
 
     const size = Array.from(model.getFilterItems('size').values());
 
@@ -75,51 +138,55 @@ class ViewMain {
     );
   }
 
+  // отрисовка товара
+  private createProduct(parrent: HTMLElement, item: IProduct): void {
+    const prodItem = createElement('div', 'product__item', parrent);
+    const itemImage = createElement('div', 'item__image', prodItem);
+    itemImage.style.backgroundImage = `url(${item.thumbnail})`;
+    const itemInfoBlock = createElement('div', 'item__info-block', prodItem);
+    const infoCaption = createElement('div', 'info__caption', itemInfoBlock);
+    createElement('span', 'caption__brand', infoCaption).textContent = item.manufacturer;
+    createElement('span', '', infoCaption).textContent = ` - `;
+    createElement('span', 'caption__title', infoCaption).textContent = item.title;
+    const infoBlock = createElement('div', 'info__block', itemInfoBlock);
+    const infoBlockLeft = createElement('div', 'info__block-left', infoBlock);
+    const infoRating = createElement('div', 'info__rating', infoBlockLeft);
+    const rating = createElement('span', 'rating__star', infoRating);
+    for (let i = 0; i < 5; i += 1) {
+      const img = new Image();
+      Math.round(item.rating) >= i + 1 ? (img.src = starFill) : (img.src = star);
+      img.alt = 'rating';
+      img.width = 20;
+      img.height = 20;
+      rating.appendChild(img);
+    }
+    createElement('span', 'rating__value', infoRating).textContent = ` (${item.rating}) `;
+    createElement('span', 'rating__stock', infoRating).textContent = String(item.stock);
+    const infoPrice = createElement('div', 'info__price', infoBlockLeft);
+    createElement('span', 'price__currency', infoPrice).textContent = `$`;
+    if (item.discountPercentage > 0) {
+      const currentPrice = item.price - (item.price / 100) * item.discountPercentage;
+      const priceValue = createElement('span', 'price__value', infoPrice);
+      priceValue.textContent = String(Math.trunc(currentPrice));
+      const value = ' ' + String(Math.round((item.price % 1) * 100)).padStart(2, '0');
+      createElement('span', '', priceValue).textContent = value;
+      createElement('span', 'price__discont', infoPrice).textContent = `$${item.price}`;
+    } else {
+      const priceValue = createElement('span', 'price__value', infoPrice);
+      priceValue.textContent = String(Math.trunc(item.price));
+      const value = ' ' + String(Math.round((item.price % 1) * 100)).padStart(2, '0');
+      createElement('span', '', priceValue).textContent = value;
+      createElement('span', 'price__discont', infoPrice);
+    }
+    const infoBlockRight = createElement('div', 'info__block-right', infoBlock);
+    createElement('div', 'add-to-cart_control', infoBlockRight);
+  }
+
+  // отрисовка блока товаров
   private createProductsBlock(parrent: HTMLElement, model: Model): void {
     const items: IProducts = model.getItems();
     items.products.forEach((item: IProduct) => {
-      const prodItem = createElement('div', 'product__item', parrent);
-      const imageURL = `url(${item.thumbnail})`;
-      createElement('div', 'item__image', prodItem).style.backgroundImage = imageURL;
-      const itemInfoBlock = createElement('div', 'item__info-block', prodItem);
-      const infoCaption = createElement('div', 'info__caption', itemInfoBlock);
-      createElement('span', 'caption__brand', infoCaption).textContent = item.manufacturer;
-      createElement('span', '', infoCaption).textContent = ` - `;
-      createElement('span', 'caption__title', infoCaption).textContent = item.title;
-      const infoBlock = createElement('div', 'info__block', itemInfoBlock);
-      const infoBlockLeft = createElement('div', 'info__block-left', infoBlock);
-      const infoRating = createElement('div', 'info__rating', infoBlockLeft);
-      const rating = createElement('span', 'rating__star', infoRating);
-      for (let i = 0; i < 5; i += 1) {
-        const img = new Image();
-        Math.round(item.rating) >= i + 1 ? (img.src = starFill) : (img.src = star);
-        img.alt = 'rating';
-        img.width = 20;
-        img.height = 20;
-        rating.appendChild(img);
-      }
-      createElement('span', 'rating__value', infoRating).textContent = ` (${item.rating}) `;
-      createElement('span', 'rating__stock', infoRating).textContent = String(item.stock);
-      const infoPrice = createElement('div', 'info__price', infoBlockLeft);
-      createElement('span', 'price__currency', infoPrice).textContent = `$`;
-      if (item.discountPercentage > 0) {
-        const price = item.price;
-        const discont = item.discountPercentage;
-        const currentPrice = price - (price / 100) * discont;
-        const priceValue = createElement('span', 'price__value', infoPrice);
-        priceValue.textContent = String(Math.trunc(currentPrice));
-        const value = ' ' + String(Math.round((item.price % 1) * 100)).padStart(2, '0');
-        createElement('span', '', priceValue).textContent = value;
-        createElement('span', 'price__discont', infoPrice).textContent = `$${item.price}`;
-      } else {
-        const priceValue = createElement('span', 'price__value', infoPrice);
-        priceValue.textContent = String(Math.trunc(item.price));
-        const value = ' ' + String(Math.round((item.price % 1) * 100)).padStart(2, '0');
-        createElement('span', '', priceValue).textContent = value;
-        createElement('span', 'price__discont', infoPrice);
-      }
-      const infoBlockRight = createElement('div', 'info__block-right', infoBlock);
-      createElement('div', 'add-to-cart_control', infoBlockRight);
+      this.createProduct(parrent, item);
     });
   }
 

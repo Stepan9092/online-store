@@ -18,6 +18,7 @@ class App {
 
     // fill category
     // this.mainPage.fillFilter(this.model);
+    this.model.getCategoryItemsCount('gender', 'men');
   }
 }
 
