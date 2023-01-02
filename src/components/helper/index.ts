@@ -30,3 +30,11 @@ export function createElement(
 
   return el;
 }
+
+export function removeChild(element: HTMLElement) {
+  while (element.firstChild) {
+    if (element.lastChild) {
+      element.removeChild(element.lastChild);
+    }
+  }
+}

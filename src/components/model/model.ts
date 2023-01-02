@@ -1,12 +1,5 @@
 import base from '../model/products.json';
-import { IProduct, IProducts } from '../types/index';
-
-interface IFilterItems {
-  id: number;
-  filterCategory: string;
-  filterValue: string;
-  filterStatus: boolean;
-}
+import { IProduct, IProducts, IFilterItems } from '../types/index';
 
 class Model {
   private prodBase: IProducts;
@@ -15,10 +8,6 @@ class Model {
   constructor() {
     this.prodBase = base;
     this.filter = new Array<IFilterItems>();
-  }
-
-  run(): void {
-    console.log('model run');
   }
 
   getFilterItems(filterName: string): Set<string> {
@@ -36,13 +25,20 @@ class Model {
     }).length;
   }
 
+  // Коллличество отображаемых товаров в заданной категории.
+  getShowedItemsCount(categoryName: string, categoryValue: string): number {
+    return this.getItems().products.filter((item: IProduct) => {
+      return item[categoryName as keyof typeof item] === categoryValue;
+    }).length;
+  }
+
   // Общее колличество товаров.
   getItemsCount(): number {
     return this.prodBase.products.length;
   }
 
   changeFilter(filterCategory: string, filterValue: string, filterStatus: boolean): void {
-    console.log(filterCategory, filterValue, filterStatus);
+    // console.log(filterCategory, filterValue, filterStatus);
     if (filterStatus === true) {
       const newFilter: IFilterItems = {
         id: this.filter.length,
@@ -58,66 +54,54 @@ class Model {
         }
       });
     }
+  }
 
-    console.log(this.filter);
+  private applyFilter(filterCategory: string, currentBase: IProducts): void {
+    let currentFilter = new Array<IFilterItems>();
+    currentFilter = this.filter
+      .filter((filter) => filter.filterStatus)
+      .filter((filter) => filter.filterCategory === filterCategory);
+
+    if (currentFilter.length > 0) {
+      currentBase.products = currentBase.products.filter((item) => {
+        return currentFilter.some((filter) => {
+          return item[filter.filterCategory as keyof typeof item] === filter.filterValue;
+        });
+      });
+    }
+  }
+
+  isFilterUsed(filterCategory: string, filterValue: string): boolean {
+    const applyFiltersCount = this.filter
+      .filter((filter) => filter.filterStatus)
+      .filter((filter) => filter.filterCategory === filterCategory)
+      .filter((filter) => filter.filterValue === filterValue).length;
+
+    return applyFiltersCount > 0;
   }
 
   getItems(): IProducts {
-    // title
-    // manufacturer
-    // rating
-    // stock
-    // price
-    // discountPercentage
-
-    // Возвращать товары для рендера с учетом текущего фильтра
+    // copy all goods.
     const tempBase: IProducts = {
       products: this.prodBase.products.map((item) => item),
     };
 
+    // apply sorting.
+
+    // aply text search.
+
+    // apply filter.
     if (this.filter.length) {
-      // get actual filter
-      let tempFilter = new Array<IFilterItems>();
-      tempFilter = this.filter.filter((filter) => filter.filterStatus);
-
-      // filter level 1 - category
-      let categoryFilter = new Array<IFilterItems>();
-      categoryFilter = tempFilter.filter((filter) => filter.filterCategory === 'category');
-
-      if (categoryFilter.length > 0) {
-        tempBase.products = tempBase.products.filter((item) => {
-          return categoryFilter.some((filter) => {
-            return item[filter.filterCategory as keyof typeof item] === filter.filterValue;
-          });
-        });
-      }
-
-      // filter level 2 - brand
-      let brandFilter = new Array<IFilterItems>();
-      brandFilter = tempFilter.filter((filter) => filter.filterCategory === 'manufacturer');
-
-      if (brandFilter.length > 0) {
-        tempBase.products = tempBase.products.filter((item) => {
-          return brandFilter.some((filter) => {
-            return item[filter.filterCategory as keyof typeof item] === filter.filterValue;
-          });
-        });
-      }
-
-      // filter level 3 - sex
-      let genderFilter = new Array<IFilterItems>();
-      genderFilter = tempFilter.filter((filter) => filter.filterCategory === 'gender');
-
-      if (genderFilter.length > 0) {
-        tempBase.products = tempBase.products.filter((item) => {
-          return genderFilter.some((filter) => {
-            return item[filter.filterCategory as keyof typeof item] === filter.filterValue;
-          });
-        });
-      }
+      this.applyFilter('category', tempBase);
+      this.applyFilter('manufacturer', tempBase);
+      this.applyFilter('gender', tempBase);
     }
 
     return tempBase;
+  }
+
+  run(): void {
+    console.log('model run');
   }
 }
 

@@ -18,3 +18,10 @@ export interface IProduct {
 export interface IProducts {
   products: Array<IProduct>;
 }
+
+export interface IFilterItems {
+  id: number;
+  filterCategory: string;
+  filterValue: string;
+  filterStatus: boolean;
+}

@@ -1,5 +1,5 @@
 import Model from '../../model/model';
-import { createElement } from '../../helper/index';
+import { createElement, removeChild } from '../../helper/index';
 import { IProduct, IProducts } from '../../types/index';
 import starFill from '../../../assets/star_fill.png';
 import star from '../../../assets/star.png';
@@ -12,7 +12,7 @@ class ViewMain {
   }
 
   // Добавление категорий фильтров.
-  private createFilterBlock(parrent: HTMLElement): void {
+  private renderFilterBlock(parrent: HTMLElement): void {
     const filterControls = createElement('div', 'filter__controls', parrent);
     createElement('div', 'control__reset', filterControls);
     createElement('div', 'control__copy', filterControls);
@@ -26,8 +26,8 @@ class ViewMain {
     const filterSex = createElement('div', 'filter filter__sex', parrent);
     createElement('div', 'filter__caption', filterSex).textContent = 'Sex';
 
-    const filterSize = createElement('div', 'filter filter__size', parrent);
-    createElement('div', 'filter__caption', filterSize).textContent = 'Size';
+    // const filterSize = createElement('div', 'filter filter__size', parrent);
+    // createElement('div', 'filter__caption', filterSize).textContent = 'Size';
 
     const filterPrice = createElement('div', 'filter filter__price', parrent);
     createElement('div', 'filter__caption', filterPrice).textContent = 'Price';
@@ -57,30 +57,40 @@ class ViewMain {
           ['type', 'checkbox'],
           ['id', item],
           ['name', item]
-        );
+        ) as HTMLInputElement;
+
         input.setAttribute('data-category', filterCategoty);
 
+        // проверка на использование текущего фильтра.
+        if (model !== undefined) {
+          input.checked = model.isFilterUsed(filterCategoty, item);
+        }
+
+        // !ПЕРЕНЕСТИ В CONTROLLER
         input.addEventListener('change', (event) => {
           const target: HTMLInputElement = event.target as HTMLInputElement;
 
           if (target) {
-            // console.log(
-            //   target.getAttribute('name'),
-            //   ' / ',
-            //   target.getAttribute('data-category'),
-            //   ' ',
-            //   target.checked
-            // );\
             const category: string | null = target.getAttribute('data-category');
             const name: string | null = target.getAttribute('name');
             if (model !== undefined) {
               if (category !== null && name !== null) {
                 model.changeFilter(category, name, target.checked);
-                // this.render(model);
+
+                // render filter
+                const filterBlock: HTMLElement | null = document.querySelector('.main__filter');
+
+                if (filterBlock !== null) {
+                  removeChild(filterBlock);
+                  this.renderFilterBlock(filterBlock);
+                  this.fillFilter(model);
+                }
+                // render goods
                 const productsBlock: HTMLElement | null = document.querySelector('.main__products');
+
                 if (productsBlock !== null) {
-                  productsBlock.innerHTML = ''; // ПЕРЕДЕЛАТЬ.
-                  this.createProductsBlock(productsBlock, model);
+                  removeChild(productsBlock);
+                  this.renderGodsBlock(productsBlock, model);
                 }
               }
             }
@@ -91,11 +101,9 @@ class ViewMain {
         createElement('span', '', itemLabel).textContent = item;
 
         if (filterCategoty !== undefined && model !== undefined) {
-          // console.log(item, filterCategoty, model.getCategoryItemsCount(filterCategoty, item));
-          const filterCount = `(${model.getCategoryItemsCount(
-            filterCategoty,
-            item
-          )}/${model.getItemsCount()})`;
+          const categoryItemsCount = model.getCategoryItemsCount(filterCategoty, item);
+          const showedItemsCount = model.getShowedItemsCount(filterCategoty, item);
+          const filterCount = `(${showedItemsCount}/${categoryItemsCount})`;
           createElement('span', '', itemLabel).textContent = filterCount;
         } else {
           createElement('span', '', itemLabel).textContent = '(0/0)';
@@ -183,7 +191,7 @@ class ViewMain {
   }
 
   // отрисовка блока товаров
-  private createProductsBlock(parrent: HTMLElement, model: Model): void {
+  private renderGodsBlock(parrent: HTMLElement, model: Model): void {
     const items: IProducts = model.getItems();
     items.products.forEach((item: IProduct) => {
       this.createProduct(parrent, item);
@@ -192,10 +200,12 @@ class ViewMain {
 
   // Отрисовка главной страницы
   render(model: Model): void {
-    console.log('ViewMain render!');
+    // console.log('ViewMain render!');
+    // model.changeFilter('category', 'walking', true);
+
     this.main = createElement('div', 'main-wrapper', this.main);
-    this.createFilterBlock(createElement('div', 'main__filter', this.main));
-    this.createProductsBlock(createElement('div', 'main__products', this.main), model);
+    this.renderFilterBlock(createElement('div', 'main__filter', this.main));
+    this.renderGodsBlock(createElement('div', 'main__products', this.main), model);
     this.fillFilter(model);
   }
 }

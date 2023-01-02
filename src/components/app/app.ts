@@ -3,22 +3,22 @@ import ViewMain from '../view/main/index';
 
 class App {
   private model: Model;
-  private mainPage: ViewMain;
+  private view: ViewMain;
 
   constructor() {
     this.model = new Model();
-    this.mainPage = new ViewMain();
+    this.view = new ViewMain();
   }
 
   run(): void {
     // console.log('App run');
 
     // this.model.run();
-    this.mainPage.render(this.model);
+    this.view.render(this.model);
 
     // fill category
     // this.mainPage.fillFilter(this.model);
-    this.model.getCategoryItemsCount('gender', 'men');
+    // this.model.getCategoryItemsCount('gender', 'men');
   }
 }
 
