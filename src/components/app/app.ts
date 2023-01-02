@@ -2,19 +2,18 @@ import Model from '../model/model';
 import ViewMain from '../view/main/index';
 
 class App {
-  private model: Model;
   private view: ViewMain;
+  private model: Model;
 
   constructor() {
-    this.model = new Model();
     this.view = new ViewMain();
+    this.model = new Model(this.view);
   }
 
   run(): void {
     // console.log('App run');
 
-    // this.model.run();
-    this.view.render(this.model);
+    this.model.run();
 
     // fill category
     // this.mainPage.fillFilter(this.model);

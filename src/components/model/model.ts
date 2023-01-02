@@ -1,11 +1,14 @@
 import base from '../model/products.json';
+import ViewMain from '../view/main/index';
 import { IProduct, IProducts, IFilterItems } from '../types/index';
 
 class Model {
+  private view: ViewMain;
   private prodBase: IProducts;
   private filter: Array<IFilterItems>;
 
-  constructor() {
+  constructor(view: ViewMain) {
+    this.view = view;
     this.prodBase = base;
     this.filter = new Array<IFilterItems>();
   }
@@ -101,7 +104,7 @@ class Model {
   }
 
   run(): void {
-    console.log('model run');
+    this.view.render(this);
   }
 }
 
