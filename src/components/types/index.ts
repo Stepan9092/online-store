@@ -25,3 +25,9 @@ export interface IFilterItems {
   filterValue: string;
   filterStatus: boolean;
 }
+
+export interface IFilterItemSlider {
+  id: string;
+  filterValueMin: number;
+  filterValueMax: number;
+}

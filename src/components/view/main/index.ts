@@ -11,7 +11,7 @@ class ViewMain {
     this.main = document.querySelector('main');
   }
 
-  // Отрисовка одного фильтра(строки).
+  // Отрисовка фильтра.
   private fillFilterItem(filter: HTMLElement, filterCategoty: string, model: Model): void {
     if (filter !== undefined && filterCategoty !== undefined) {
       const filterItemsBrand: Array<string> = Array.from(
@@ -38,7 +38,7 @@ class ViewMain {
           input.checked = model.isFilterUsed(filterCategoty, item);
         }
 
-        // !ПЕРЕНЕСТИ В CONTROLLER ???
+        // Обработка событий выбора фильтров.
         input.addEventListener('change', (event) => {
           const target: HTMLInputElement = event.target as HTMLInputElement;
 
@@ -48,12 +48,6 @@ class ViewMain {
             if (model !== undefined) {
               if (category !== null && name !== null) {
                 model.changeFilter(category, name, target.checked);
-
-                // render filter
-                this.renderFilterBlock(model);
-
-                // render goods
-                this.renderGodsBlock(model);
               }
             }
           }
@@ -74,8 +68,73 @@ class ViewMain {
     }
   }
 
+  // Отрисовать фильтры слайдеры.
+  private renderFilterSlider(parent: HTMLElement, id: string, model: Model): void {
+    const min: number = model.getMinValues(id);
+    const max: number = model.getMaxValues(id);
+
+    const multiRangeLabel = createElement('div', 'multi__range_label', parent);
+
+    const labelLeft = createElement('div', 'multi__range_label-left', multiRangeLabel);
+    createElement('div', 'multi__range_label-center', multiRangeLabel).textContent = '⟷';
+    const labelRight = createElement('div', 'multi__range_label-right', multiRangeLabel);
+
+    let currentMinValue = model.getCurrentMinValues(id);
+    if (currentMinValue === -1) {
+      currentMinValue = min;
+    }
+
+    const multiRange = createElement('div', 'multi__range', parent);
+    const inputLower = createElement(
+      'input',
+      '',
+      multiRange,
+      ['type', 'range'],
+      ['id', `${id}__lower`],
+      ['min', String(min)],
+      ['max', String(max)],
+      ['value', String(currentMinValue)],
+      ['step', '1']
+    );
+
+    let currentMaxValue = model.getCurrentMaxValues(id);
+    if (currentMaxValue === -1) {
+      currentMaxValue = max;
+    }
+
+    const inputUpper = createElement(
+      'input',
+      '',
+      multiRange,
+      ['type', 'range'],
+      ['id', `${id}__upper`],
+      ['min', String(min)],
+      ['max', String(max)],
+      ['value', String(currentMaxValue)],
+      ['step', '1']
+    );
+
+    labelLeft.textContent = String(currentMinValue);
+    labelRight.textContent = String(currentMaxValue);
+
+    [inputLower, inputUpper].forEach((item) => {
+      item.addEventListener('input', () => {
+        const targetInputLower: HTMLInputElement | null = inputLower as HTMLInputElement;
+        const targetInputUpper: HTMLInputElement | null = inputUpper as HTMLInputElement;
+        if (targetInputLower !== null && targetInputUpper !== null) {
+          const min = Math.min(Number(targetInputLower.value), Number(targetInputUpper.value));
+          const max = Math.max(Number(targetInputLower.value), Number(targetInputUpper.value));
+          labelLeft.textContent = String(min);
+          labelRight.textContent = String(max);
+
+          model.changeSliderFilter(id, min, max);
+        }
+      });
+    });
+  }
+
   // Отрисовка всех категорий фильтров.
-  private renderFilterBlock(model: Model): void {
+  renderFilterBlock(model: Model): void {
     let filtersBlock: HTMLElement | null = document.querySelector('.main__filter');
 
     if (filtersBlock === null) {
@@ -102,9 +161,11 @@ class ViewMain {
 
     const filterPrice = createElement('div', 'filter filter__price', filtersBlock);
     createElement('div', 'filter__caption', filterPrice).textContent = 'Price';
+    this.renderFilterSlider(filterPrice, 'price', model);
 
     const filterStock = createElement('div', 'filter filter__stock', filtersBlock);
-    createElement('div', 'filter__caption', filterStock).textContent = 'stock';
+    createElement('div', 'filter__caption', filterStock).textContent = 'Stock';
+    this.renderFilterSlider(filterStock, 'stock', model);
   }
 
   // отрисовка единицы товара
@@ -152,7 +213,7 @@ class ViewMain {
   }
 
   // отрисовка блока товаров
-  private renderGodsBlock(model: Model): void {
+  renderGodsBlock(model: Model): void {
     let goodsBlock: HTMLElement | null = document.querySelector('.main__products');
 
     if (goodsBlock === null) {

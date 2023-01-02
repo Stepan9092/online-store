@@ -1,11 +1,21 @@
 import base from '../model/products.json';
 import ViewMain from '../view/main/index';
-import { IProduct, IProducts, IFilterItems } from '../types/index';
+import { IProduct, IProducts, IFilterItems, IFilterItemSlider } from '../types/index';
 
 class Model {
   private view: ViewMain;
   private prodBase: IProducts;
   private filter: Array<IFilterItems>;
+  private filterPrice: IFilterItemSlider = {
+    id: 'price',
+    filterValueMin: 50,
+    filterValueMax: -1,
+  };
+  private filterStock: IFilterItemSlider = {
+    id: 'stock',
+    filterValueMin: -1,
+    filterValueMax: -1,
+  };
 
   constructor(view: ViewMain) {
     this.view = view;
@@ -40,6 +50,7 @@ class Model {
     return this.prodBase.products.length;
   }
 
+  // Применяет либо отменяет фильтр чекбокс.
   changeFilter(filterCategory: string, filterValue: string, filterStatus: boolean): void {
     // console.log(filterCategory, filterValue, filterStatus);
     if (filterStatus === true) {
@@ -57,6 +68,28 @@ class Model {
         }
       });
     }
+
+    // render
+    this.view.renderFilterBlock(this);
+    this.view.renderGodsBlock(this);
+  }
+
+  // Применяет либо отменяет фильтр слайдер.
+  changeSliderFilter(filterCategory: string, filterValueMin: number, filterValueMax: number): void {
+    if (filterCategory === 'price') {
+      this.filterPrice.filterValueMax = filterValueMax;
+      this.filterPrice.filterValueMin = filterValueMin;
+    }
+
+    if (filterCategory === 'stock') {
+      this.filterStock.filterValueMax = filterValueMax;
+      this.filterStock.filterValueMin = filterValueMin;
+    }
+
+    // render
+    //!!!! ОБНОВЛЕНИЕ СЧЕТЧИКОВ В БЛОКЕ ФИЛЬТРОВ, НЕ ПЕРЕРИСОВКА А ОБНОВЛЕНИЕ!!!
+    // this.view.renderFilterBlock(this);
+    this.view.renderGodsBlock(this);
   }
 
   private applyFilter(filterCategory: string, currentBase: IProducts): void {
@@ -74,6 +107,22 @@ class Model {
     }
   }
 
+  private applyFilterSliders(currentBase: IProducts): void {
+    [this.filterPrice, this.filterStock].forEach((filter) => {
+      currentBase.products = currentBase.products.filter((item) => {
+        if (filter.filterValueMin !== -1 && filter.filterValueMax !== -1) {
+          return (
+            item[filter.id as keyof typeof item] >= filter.filterValueMin &&
+            item[filter.id as keyof typeof item] <= filter.filterValueMax
+          );
+        }
+
+        return true;
+      });
+    });
+  }
+
+  // Проверка активный ли данный фильтр в данный момент.
   isFilterUsed(filterCategory: string, filterValue: string): boolean {
     const applyFiltersCount = this.filter
       .filter((filter) => filter.filterStatus)
@@ -81,6 +130,101 @@ class Model {
       .filter((filter) => filter.filterValue === filterValue).length;
 
     return applyFiltersCount > 0;
+  }
+
+  // Получить минимальное значение указанного фильтра
+  getMinValues(filterCategory: string): number {
+    let min: number | undefined = undefined;
+
+    // this.getItems().products.forEach((item) => {
+    //   if (min === undefined) {
+    //     min = Number(item[filterCategory as keyof typeof item]);
+    //   } else {
+    //     if (Number(item[filterCategory as keyof typeof item]) < min) {
+    //       min = Number(item[filterCategory as keyof typeof item]);
+    //     }
+    //   }
+    // });
+
+    this.prodBase.products.forEach((item) => {
+      if (min === undefined) {
+        min = Number(item[filterCategory as keyof typeof item]);
+      } else {
+        if (Number(item[filterCategory as keyof typeof item]) < min) {
+          min = Number(item[filterCategory as keyof typeof item]);
+        }
+      }
+    });
+
+    return min ? min : 0;
+  }
+
+  // Получить максимальное значение указанного фильтра
+  getMaxValues(filterCategory: string): number {
+    let max: number | undefined = undefined;
+
+    // this.getItems().products.forEach((item) => {
+    //   if (max === undefined) {
+    //     max = Number(item[filterCategory as keyof typeof item]);
+    //   } else {
+    //     if (Number(item[filterCategory as keyof typeof item]) > max) {
+    //       max = Number(item[filterCategory as keyof typeof item]);
+    //     }
+    //   }
+    // });
+    this.prodBase.products.forEach((item) => {
+      if (max === undefined) {
+        max = Number(item[filterCategory as keyof typeof item]);
+      } else {
+        if (Number(item[filterCategory as keyof typeof item]) > max) {
+          max = Number(item[filterCategory as keyof typeof item]);
+        }
+      }
+    });
+
+    return max ? max : 0;
+  }
+
+  getCurrentMinValues(filterCategory: string): number {
+    // let value = -1;
+    // value = filterCategory === 'price' ? this.filterPrice.filterValueMin : -1;
+    // value = filterCategory === 'stock' ? this.filterStock.filterValueMin : -1;
+
+    // return value;
+    let min: number | undefined = undefined;
+
+    this.getItems().products.forEach((item) => {
+      if (min === undefined) {
+        min = Number(item[filterCategory as keyof typeof item]);
+      } else {
+        if (Number(item[filterCategory as keyof typeof item]) < min) {
+          min = Number(item[filterCategory as keyof typeof item]);
+        }
+      }
+    });
+
+    return min ? min : 0;
+  }
+
+  getCurrentMaxValues(filterCategory: string): number {
+    // let value = -1;
+    // value = filterCategory === 'price' ? this.filterPrice.filterValueMax : -1;
+    // value = filterCategory === 'stock' ? this.filterStock.filterValueMax : -1;
+
+    // return value;
+    let max: number | undefined = undefined;
+
+    this.getItems().products.forEach((item) => {
+      if (max === undefined) {
+        max = Number(item[filterCategory as keyof typeof item]);
+      } else {
+        if (Number(item[filterCategory as keyof typeof item]) > max) {
+          max = Number(item[filterCategory as keyof typeof item]);
+        }
+      }
+    });
+
+    return max ? max : 0;
   }
 
   getItems(): IProducts {
@@ -93,12 +237,15 @@ class Model {
 
     // aply text search.
 
-    // apply filter.
+    // apply checkbox filter.
     if (this.filter.length) {
       this.applyFilter('category', tempBase);
       this.applyFilter('manufacturer', tempBase);
       this.applyFilter('gender', tempBase);
     }
+
+    // apply slider filter.
+    this.applyFilterSliders(tempBase);
 
     return tempBase;
   }
