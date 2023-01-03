@@ -23,6 +23,7 @@ class Model {
     this.filter = new Array<IFilterItems>();
   }
 
+  // получить массив строк - фильтров
   getFilterItems(filterName: string): Set<string> {
     const items: Set<string> = new Set<string>();
     this.prodBase.products.forEach((item: IProduct) => {
@@ -40,7 +41,7 @@ class Model {
 
   // Коллличество отображаемых товаров в заданной категории.
   getShowedItemsCount(categoryName: string, categoryValue: string): number {
-    return this.getItems().products.filter((item: IProduct) => {
+    return this.getGoods().products.filter((item: IProduct) => {
       return item[categoryName as keyof typeof item] === categoryValue;
     }).length;
   }
@@ -50,7 +51,7 @@ class Model {
     return this.prodBase.products.length;
   }
 
-  // Применяет либо отменяет фильтр чекбокс.
+  // Применяет / отменяет фильтр чекбокс.
   changeFilter(filterCategory: string, filterValue: string, filterStatus: boolean): void {
     // console.log(filterCategory, filterValue, filterStatus);
     if (filterStatus === true) {
@@ -70,13 +71,12 @@ class Model {
     }
 
     // render
-    // this.view.renderFilterBlock(this);
-    this.view.updateFiltersCounter(this);
-    this.view.renderGodsBlock(this);
+    this.view.renderFilters(this);
+    this.view.renderGods(this);
   }
 
-  // Применяет либо отменяет фильтр слайдер.
-  changeSliderFilter(filterCategory: string, filterValueMin: number, filterValueMax: number): void {
+  // Применяет / отменяет фильтр слайдер.
+  changeFilterSlider(filterCategory: string, filterValueMin: number, filterValueMax: number): void {
     if (filterCategory === 'price') {
       this.filterPrice.filterValueMax = filterValueMax;
       this.filterPrice.filterValueMin = filterValueMin;
@@ -90,9 +90,10 @@ class Model {
     // render
     // обновление счетчиков в блоке фильтров.
     this.view.updateFiltersCounter(this);
-    this.view.renderGodsBlock(this);
+    this.view.renderGods(this);
   }
 
+  // отфильтровать переданный массив товаров с учетом указанного фильтра.
   private applyFilter(filterCategory: string, currentBase: IProducts): void {
     let currentFilter = new Array<IFilterItems>();
     currentFilter = this.filter
@@ -108,6 +109,7 @@ class Model {
     }
   }
 
+  // отфильтровать переданный массив товаров с учетом фильтров слайдеров.
   private applyFilterSliders(currentBase: IProducts): void {
     [this.filterPrice, this.filterStock].forEach((filter) => {
       currentBase.products = currentBase.products.filter((item) => {
@@ -133,7 +135,7 @@ class Model {
     return applyFiltersCount > 0;
   }
 
-  // Получить минимальное значение указанного фильтра
+  // Получить минимальное значение указанного фильтра слайдера
   getMinValues(filterCategory: string): number {
     let min: number | undefined = undefined;
 
@@ -150,7 +152,7 @@ class Model {
     return min ? min : 0;
   }
 
-  // Получить максимальное значение указанного фильтра
+  // Получить максимальное значение указанного фильтра слайдера
   getMaxValues(filterCategory: string): number {
     let max: number | undefined = undefined;
 
@@ -170,7 +172,7 @@ class Model {
   getCurrentMinValues(filterCategory: string): number {
     let min: number | undefined = undefined;
 
-    this.getItems().products.forEach((item) => {
+    this.getGoods().products.forEach((item) => {
       if (min === undefined) {
         min = Number(item[filterCategory as keyof typeof item]);
       } else {
@@ -186,7 +188,7 @@ class Model {
   getCurrentMaxValues(filterCategory: string): number {
     let max: number | undefined = undefined;
 
-    this.getItems().products.forEach((item) => {
+    this.getGoods().products.forEach((item) => {
       if (max === undefined) {
         max = Number(item[filterCategory as keyof typeof item]);
       } else {
@@ -199,7 +201,8 @@ class Model {
     return max ? max : 0;
   }
 
-  getItems(): IProducts {
+  // получение отфильтрованного списка товаров
+  getGoods(): IProducts {
     // copy all goods.
     const tempBase: IProducts = {
       products: this.prodBase.products.map((item) => item),

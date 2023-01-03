@@ -11,8 +11,8 @@ class ViewMain {
     this.main = document.querySelector('main');
   }
 
-  // Отрисовка фильтра.
-  private fillFilterItem(filter: HTMLElement, filterCategoty: string, model: Model): void {
+  // Отрисовка фильтра (input checkbox).
+  private renderFilter(filter: HTMLElement, filterCategoty: string, model: Model): void {
     if (filter !== undefined && filterCategoty !== undefined) {
       const filterItemsBrand: Array<string> = Array.from(
         model.getFilterItems(filterCategoty).values()
@@ -68,7 +68,7 @@ class ViewMain {
     }
   }
 
-  // Отрисовать фильтры слайдеры.
+  // Отрисовать фильтр слайдер. (input range).
   private renderFilterSlider(parent: HTMLElement, id: string, model: Model): void {
     const min: number = model.getMinValues(id);
     const max: number = model.getMaxValues(id);
@@ -135,14 +135,14 @@ class ViewMain {
           labelRight.textContent = String(max);
 
           console.log(id, min, max);
-          model.changeSliderFilter(id, min, max);
+          model.changeFilterSlider(id, min, max);
         }
       });
     });
   }
 
   // Отрисовка всех категорий фильтров.
-  renderFilterBlock(model: Model): void {
+  renderFilters(model: Model): void {
     let filtersBlock: HTMLElement | null = document.querySelector('.main__filter');
 
     if (filtersBlock === null) {
@@ -157,15 +157,15 @@ class ViewMain {
 
     const filterCategry = createElement('div', 'filter filter__categry', filtersBlock);
     createElement('div', 'filter__caption', filterCategry).textContent = 'Category';
-    this.fillFilterItem(filterCategry, 'category', model);
+    this.renderFilter(filterCategry, 'category', model);
 
     const filterBrand = createElement('div', 'filter filter__brand', filtersBlock);
     createElement('div', 'filter__caption', filterBrand).textContent = 'Brand';
-    this.fillFilterItem(filterBrand, 'manufacturer', model);
+    this.renderFilter(filterBrand, 'manufacturer', model);
 
     const filterSex = createElement('div', 'filter filter__sex', filtersBlock);
     createElement('div', 'filter__caption', filterSex).textContent = 'Sex';
-    this.fillFilterItem(filterSex, 'gender', model);
+    this.renderFilter(filterSex, 'gender', model);
 
     const filterPrice = createElement('div', 'filter filter__price', filtersBlock);
     createElement('div', 'filter__caption', filterPrice).textContent = 'Price';
@@ -176,8 +176,32 @@ class ViewMain {
     this.renderFilterSlider(filterStock, 'stock', model);
   }
 
+  // обновление счетчиков фильтров.
+  updateFiltersCounter(model: Model): void {
+    const filterCategry: HTMLElement | null = document.querySelector('.filter__categry');
+    if (filterCategry !== null) {
+      removeChild(filterCategry);
+      createElement('div', 'filter__caption', filterCategry).textContent = 'Category';
+      this.renderFilter(filterCategry, 'category', model);
+    }
+
+    const filterBrand: HTMLElement | null = document.querySelector('.filter__brand');
+    if (filterBrand !== null) {
+      removeChild(filterBrand);
+      createElement('div', 'filter__caption', filterBrand).textContent = 'Brand';
+      this.renderFilter(filterBrand, 'manufacturer', model);
+    }
+
+    const filterSex: HTMLElement | null = document.querySelector('.filter__sex');
+    if (filterSex !== null) {
+      removeChild(filterSex);
+      createElement('div', 'filter__caption', filterSex).textContent = 'Sex';
+      this.renderFilter(filterSex, 'gender', model);
+    }
+  }
+
   // отрисовка единицы товара
-  private createProduct(parrent: HTMLElement | null, item: IProduct): void {
+  private renderGodsCard(parrent: HTMLElement | null, item: IProduct): void {
     const prodItem = createElement('div', 'product__item', parrent);
     const itemImage = createElement('div', 'item__image', prodItem);
     itemImage.style.backgroundImage = `url(${item.thumbnail})`;
@@ -221,7 +245,7 @@ class ViewMain {
   }
 
   // отрисовка блока товаров
-  renderGodsBlock(model: Model): void {
+  renderGods(model: Model): void {
     let goodsBlock: HTMLElement | null = document.querySelector('.main__products');
 
     if (goodsBlock === null) {
@@ -230,41 +254,17 @@ class ViewMain {
       removeChild(goodsBlock);
     }
 
-    const items: IProducts = model.getItems();
+    const items: IProducts = model.getGoods();
     items.products.forEach((item: IProduct) => {
-      this.createProduct(goodsBlock, item);
+      this.renderGodsCard(goodsBlock, item);
     });
-  }
-
-  // обновление счетчиков фильтров.
-  updateFiltersCounter(model: Model): void {
-    const filterCategry: HTMLElement | null = document.querySelector('.filter__categry');
-    if (filterCategry !== null) {
-      removeChild(filterCategry);
-      createElement('div', 'filter__caption', filterCategry).textContent = 'Category';
-      this.fillFilterItem(filterCategry, 'category', model);
-    }
-
-    const filterBrand: HTMLElement | null = document.querySelector('.filter__brand');
-    if (filterBrand !== null) {
-      removeChild(filterBrand);
-      createElement('div', 'filter__caption', filterBrand).textContent = 'Brand';
-      this.fillFilterItem(filterBrand, 'manufacturer', model);
-    }
-
-    const filterSex: HTMLElement | null = document.querySelector('.filter__sex');
-    if (filterSex !== null) {
-      removeChild(filterSex);
-      createElement('div', 'filter__caption', filterSex).textContent = 'Sex';
-      this.fillFilterItem(filterSex, 'gender', model);
-    }
   }
 
   // Отрисовка главной страницы
   render(model: Model): void {
     this.main = createElement('div', 'main-wrapper', this.main);
-    this.renderFilterBlock(model);
-    this.renderGodsBlock(model);
+    this.renderFilters(model);
+    this.renderGods(model);
   }
 }
 
