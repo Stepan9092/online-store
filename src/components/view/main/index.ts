@@ -95,17 +95,14 @@ class ViewMain {
       ['id', `${id}__lower`],
       ['min', String(min)],
       ['max', String(max)],
-      ['value', String(currentMinValue)],
-      ['step', String(step)]
+      ['step', String(step)],
+      ['value', String(currentMinValue)]
     );
 
     let currentMaxValue = model.getCurrentMaxValues(id);
     if (currentMaxValue === -1) {
       currentMaxValue = max;
     }
-
-    // document.getElementById('price__upper').value
-    console.log(currentMaxValue, String(currentMaxValue));
 
     const inputUpper = createElement(
       'input',
@@ -115,8 +112,8 @@ class ViewMain {
       ['id', `${id}__upper`],
       ['min', String(min)],
       ['max', String(max)],
-      ['value', String(currentMaxValue)],
-      ['step', String(step)]
+      ['step', String(step)],
+      ['value', String(currentMaxValue)]
     );
 
     labelLeft.textContent = String(currentMinValue);
@@ -129,12 +126,10 @@ class ViewMain {
         if (targetInputLower !== null && targetInputUpper !== null) {
           const min = Math.min(Number(targetInputLower.value), Number(targetInputUpper.value));
           const max = Math.max(Number(targetInputLower.value), Number(targetInputUpper.value));
-          console.log(Number(targetInputLower.value), Number(targetInputUpper.value));
-          console.log(max);
+
           labelLeft.textContent = String(min);
           labelRight.textContent = String(max);
 
-          console.log(id, min, max);
           model.changeFilterSlider(id, min, max);
         }
       });
