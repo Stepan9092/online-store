@@ -8,7 +8,7 @@ class Model {
   private filter: Array<IFilterItems>;
   private filterPrice: IFilterItemSlider = {
     id: 'price',
-    filterValueMin: 50,
+    filterValueMin: -1,
     filterValueMax: -1,
   };
   private filterStock: IFilterItemSlider = {
@@ -70,7 +70,8 @@ class Model {
     }
 
     // render
-    this.view.renderFilterBlock(this);
+    // this.view.renderFilterBlock(this);
+    this.view.updateFiltersCounter(this);
     this.view.renderGodsBlock(this);
   }
 
@@ -87,8 +88,8 @@ class Model {
     }
 
     // render
-    //!!!! ОБНОВЛЕНИЕ СЧЕТЧИКОВ В БЛОКЕ ФИЛЬТРОВ, НЕ ПЕРЕРИСОВКА А ОБНОВЛЕНИЕ!!!
-    // this.view.renderFilterBlock(this);
+    // обновление счетчиков в блоке фильтров.
+    this.view.updateFiltersCounter(this);
     this.view.renderGodsBlock(this);
   }
 
@@ -136,21 +137,11 @@ class Model {
   getMinValues(filterCategory: string): number {
     let min: number | undefined = undefined;
 
-    // this.getItems().products.forEach((item) => {
-    //   if (min === undefined) {
-    //     min = Number(item[filterCategory as keyof typeof item]);
-    //   } else {
-    //     if (Number(item[filterCategory as keyof typeof item]) < min) {
-    //       min = Number(item[filterCategory as keyof typeof item]);
-    //     }
-    //   }
-    // });
-
     this.prodBase.products.forEach((item) => {
       if (min === undefined) {
         min = Number(item[filterCategory as keyof typeof item]);
       } else {
-        if (Number(item[filterCategory as keyof typeof item]) < min) {
+        if (Number(item[filterCategory as keyof typeof item]) <= min) {
           min = Number(item[filterCategory as keyof typeof item]);
         }
       }
@@ -163,20 +154,11 @@ class Model {
   getMaxValues(filterCategory: string): number {
     let max: number | undefined = undefined;
 
-    // this.getItems().products.forEach((item) => {
-    //   if (max === undefined) {
-    //     max = Number(item[filterCategory as keyof typeof item]);
-    //   } else {
-    //     if (Number(item[filterCategory as keyof typeof item]) > max) {
-    //       max = Number(item[filterCategory as keyof typeof item]);
-    //     }
-    //   }
-    // });
     this.prodBase.products.forEach((item) => {
       if (max === undefined) {
         max = Number(item[filterCategory as keyof typeof item]);
       } else {
-        if (Number(item[filterCategory as keyof typeof item]) > max) {
+        if (Number(item[filterCategory as keyof typeof item]) >= max) {
           max = Number(item[filterCategory as keyof typeof item]);
         }
       }
@@ -186,18 +168,13 @@ class Model {
   }
 
   getCurrentMinValues(filterCategory: string): number {
-    // let value = -1;
-    // value = filterCategory === 'price' ? this.filterPrice.filterValueMin : -1;
-    // value = filterCategory === 'stock' ? this.filterStock.filterValueMin : -1;
-
-    // return value;
     let min: number | undefined = undefined;
 
     this.getItems().products.forEach((item) => {
       if (min === undefined) {
         min = Number(item[filterCategory as keyof typeof item]);
       } else {
-        if (Number(item[filterCategory as keyof typeof item]) < min) {
+        if (Number(item[filterCategory as keyof typeof item]) <= min) {
           min = Number(item[filterCategory as keyof typeof item]);
         }
       }
@@ -207,18 +184,13 @@ class Model {
   }
 
   getCurrentMaxValues(filterCategory: string): number {
-    // let value = -1;
-    // value = filterCategory === 'price' ? this.filterPrice.filterValueMax : -1;
-    // value = filterCategory === 'stock' ? this.filterStock.filterValueMax : -1;
-
-    // return value;
     let max: number | undefined = undefined;
 
     this.getItems().products.forEach((item) => {
       if (max === undefined) {
         max = Number(item[filterCategory as keyof typeof item]);
       } else {
-        if (Number(item[filterCategory as keyof typeof item]) > max) {
+        if (Number(item[filterCategory as keyof typeof item]) >= max) {
           max = Number(item[filterCategory as keyof typeof item]);
         }
       }

@@ -84,6 +84,8 @@ class ViewMain {
       currentMinValue = min;
     }
 
+    const step = id === 'price' ? 0.1 : 1;
+
     const multiRange = createElement('div', 'multi__range', parent);
     const inputLower = createElement(
       'input',
@@ -94,13 +96,16 @@ class ViewMain {
       ['min', String(min)],
       ['max', String(max)],
       ['value', String(currentMinValue)],
-      ['step', '1']
+      ['step', String(step)]
     );
 
     let currentMaxValue = model.getCurrentMaxValues(id);
     if (currentMaxValue === -1) {
       currentMaxValue = max;
     }
+
+    // document.getElementById('price__upper').value
+    console.log(currentMaxValue, String(currentMaxValue));
 
     const inputUpper = createElement(
       'input',
@@ -111,7 +116,7 @@ class ViewMain {
       ['min', String(min)],
       ['max', String(max)],
       ['value', String(currentMaxValue)],
-      ['step', '1']
+      ['step', String(step)]
     );
 
     labelLeft.textContent = String(currentMinValue);
@@ -124,9 +129,12 @@ class ViewMain {
         if (targetInputLower !== null && targetInputUpper !== null) {
           const min = Math.min(Number(targetInputLower.value), Number(targetInputUpper.value));
           const max = Math.max(Number(targetInputLower.value), Number(targetInputUpper.value));
+          console.log(Number(targetInputLower.value), Number(targetInputUpper.value));
+          console.log(max);
           labelLeft.textContent = String(min);
           labelRight.textContent = String(max);
 
+          console.log(id, min, max);
           model.changeSliderFilter(id, min, max);
         }
       });
@@ -226,6 +234,30 @@ class ViewMain {
     items.products.forEach((item: IProduct) => {
       this.createProduct(goodsBlock, item);
     });
+  }
+
+  // обновление счетчиков фильтров.
+  updateFiltersCounter(model: Model): void {
+    const filterCategry: HTMLElement | null = document.querySelector('.filter__categry');
+    if (filterCategry !== null) {
+      removeChild(filterCategry);
+      createElement('div', 'filter__caption', filterCategry).textContent = 'Category';
+      this.fillFilterItem(filterCategry, 'category', model);
+    }
+
+    const filterBrand: HTMLElement | null = document.querySelector('.filter__brand');
+    if (filterBrand !== null) {
+      removeChild(filterBrand);
+      createElement('div', 'filter__caption', filterBrand).textContent = 'Brand';
+      this.fillFilterItem(filterBrand, 'manufacturer', model);
+    }
+
+    const filterSex: HTMLElement | null = document.querySelector('.filter__sex');
+    if (filterSex !== null) {
+      removeChild(filterSex);
+      createElement('div', 'filter__caption', filterSex).textContent = 'Sex';
+      this.fillFilterItem(filterSex, 'gender', model);
+    }
   }
 
   // Отрисовка главной страницы
