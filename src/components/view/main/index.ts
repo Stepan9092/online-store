@@ -48,6 +48,7 @@ class ViewMain {
             if (model !== undefined) {
               if (category !== null && name !== null) {
                 model.changeFilter(category, name, target.checked);
+                model.testCalcHash();
               }
             }
           }
@@ -131,6 +132,7 @@ class ViewMain {
           labelRight.textContent = String(max);
 
           model.changeFilterSlider(id, min, max);
+          model.testCalcHash();
         }
       });
     });
@@ -138,13 +140,15 @@ class ViewMain {
 
   // Отрисовка всех категорий фильтров.
   renderFilters(model: Model): void {
-    let filtersBlock: HTMLElement | null = document.querySelector('.main__filter');
+    // let filtersBlock: HTMLElement | null = document.querySelector('.main__filter');
 
-    if (filtersBlock === null) {
-      filtersBlock = createElement('div', 'main__filter', this.main);
-    } else {
-      removeChild(filtersBlock);
-    }
+    // if (filtersBlock === null) {
+    //   filtersBlock = createElement('div', 'main__filter', this.main);
+    // } else {
+    //   removeChild(filtersBlock);
+    // }
+
+    const filtersBlock = createElement('div', 'main__filter', this.main);
 
     const filterControls = createElement('div', 'filter__controls', filtersBlock);
     createElement('div', 'control__reset', filterControls);
@@ -171,8 +175,32 @@ class ViewMain {
     this.renderFilterSlider(filterStock, 'stock', model);
   }
 
-  // обновление счетчиков фильтров.
-  updateFiltersCounter(model: Model): void {
+  // // обновление счетчиков фильтров.
+  // updateFiltersCounter(model: Model): void {
+  //   const filterCategry: HTMLElement | null = document.querySelector('.filter__categry');
+  //   if (filterCategry !== null) {
+  //     removeChild(filterCategry);
+  //     createElement('div', 'filter__caption', filterCategry).textContent = 'Category';
+  //     this.renderFilter(filterCategry, 'category', model);
+  //   }
+
+  //   const filterBrand: HTMLElement | null = document.querySelector('.filter__brand');
+  //   if (filterBrand !== null) {
+  //     removeChild(filterBrand);
+  //     createElement('div', 'filter__caption', filterBrand).textContent = 'Brand';
+  //     this.renderFilter(filterBrand, 'manufacturer', model);
+  //   }
+
+  //   const filterSex: HTMLElement | null = document.querySelector('.filter__sex');
+  //   if (filterSex !== null) {
+  //     removeChild(filterSex);
+  //     createElement('div', 'filter__caption', filterSex).textContent = 'Sex';
+  //     this.renderFilter(filterSex, 'gender', model);
+  //   }
+  // }
+
+  // обновление значения и счетчиков блока фильтров.
+  updateFiltersBlock(model: Model): void {
     const filterCategry: HTMLElement | null = document.querySelector('.filter__categry');
     if (filterCategry !== null) {
       removeChild(filterCategry);
@@ -192,6 +220,44 @@ class ViewMain {
       removeChild(filterSex);
       createElement('div', 'filter__caption', filterSex).textContent = 'Sex';
       this.renderFilter(filterSex, 'gender', model);
+    }
+
+    const filterPrice: HTMLElement | null = document.querySelector('.filter__price');
+    if (filterPrice !== null) {
+      const lower: HTMLElement | null = document.getElementById('price__lower');
+      const upper: HTMLElement | null = document.getElementById('price__upper');
+
+      if (lower !== null && upper !== null) {
+        lower.setAttribute('value', String(model.getCurrentMinValues('price')));
+        upper.setAttribute('value', String(model.getCurrentMaxValues('price')));
+      }
+
+      const lowerLabel: HTMLElement | null = filterPrice.querySelector('.multi__range_label-left');
+      const upperLabel: HTMLElement | null = filterPrice.querySelector('.multi__range_label-right');
+
+      if (lowerLabel !== null && upperLabel !== null) {
+        lowerLabel.textContent = String(model.getCurrentMinValues('price'));
+        upperLabel.textContent = String(model.getCurrentMaxValues('price'));
+      }
+    }
+
+    const filterStock: HTMLElement | null = document.querySelector('.filter__stock');
+    if (filterStock !== null) {
+      const lower: HTMLElement | null = document.getElementById('stock__lower');
+      const upper: HTMLElement | null = document.getElementById('stock__upper');
+
+      if (lower !== null && upper !== null) {
+        lower.setAttribute('value', String(model.getCurrentMinValues('stock')));
+        upper.setAttribute('value', String(model.getCurrentMaxValues('stock')));
+      }
+
+      const lowerLabel: HTMLElement | null = filterStock.querySelector('.multi__range_label-left');
+      const upperLabel: HTMLElement | null = filterStock.querySelector('.multi__range_label-right');
+
+      if (lowerLabel !== null && upperLabel !== null) {
+        lowerLabel.textContent = String(model.getCurrentMinValues('stock'));
+        upperLabel.textContent = String(model.getCurrentMaxValues('stock'));
+      }
     }
   }
 
@@ -257,8 +323,21 @@ class ViewMain {
 
   // Отрисовка главной страницы
   render(model: Model): void {
-    this.main = createElement('div', 'main-wrapper', this.main);
-    this.renderFilters(model);
+    const wrapper: HTMLElement | null = document.querySelector('.main-wrapper');
+
+    if (wrapper === null) {
+      this.main = createElement('div', 'main-wrapper', this.main);
+    }
+
+    // если фильтры уже есть то Update иначе Render.
+    const filtersBlock: HTMLElement | null = document.querySelector('.main__filter');
+
+    if (filtersBlock === null) {
+      this.renderFilters(model);
+    } else {
+      this.updateFiltersBlock(model);
+    }
+
     this.renderGods(model);
   }
 }

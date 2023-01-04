@@ -23,6 +23,18 @@ class Model {
     this.filter = new Array<IFilterItems>();
   }
 
+  clearFiler(): void {
+    while (this.filter.length) {
+      this.filter.pop();
+    }
+
+    this.filterPrice.filterValueMin = -1;
+    this.filterPrice.filterValueMax = -1;
+
+    this.filterStock.filterValueMin = -1;
+    this.filterStock.filterValueMax = -1;
+  }
+
   // получить массив строк - фильтров
   getFilterItems(filterName: string): Set<string> {
     const items: Set<string> = new Set<string>();
@@ -51,6 +63,39 @@ class Model {
     return this.prodBase.products.length;
   }
 
+  testCalcHash(): void {
+    let hash = '#/main';
+
+    // apply checkbox filters
+    this.filter
+      .filter((filter) => filter.filterStatus)
+      .forEach((item) => {
+        const addHash = `${item.filterCategory}=${item.filterValue}`;
+        if (hash.indexOf(addHash) === -1) {
+          hash = hash.indexOf('?') === -1 ? `${hash}?${addHash}` : `${hash}&${addHash}`;
+        }
+      });
+    console.log(hash);
+
+    // apply slider filters
+    [this.filterPrice, this.filterStock].forEach((filter) => {
+      if (filter.filterValueMin !== -1 && filter.filterValueMax !== -1) {
+        const addHash = `${filter.id}=${filter.filterValueMin}|${filter.filterValueMax}`;
+        if (hash.indexOf(addHash) === -1) {
+          hash = hash.indexOf('?') === -1 ? `${hash}?${addHash}` : `${hash}&${addHash}`;
+        }
+      }
+    });
+
+    console.log(hash);
+
+    if (window.location.hash !== hash) {
+      window.location.hash = hash;
+    }
+
+    this.view.render(this);
+  }
+
   // Применяет / отменяет фильтр чекбокс.
   changeFilter(filterCategory: string, filterValue: string, filterStatus: boolean): void {
     // console.log(filterCategory, filterValue, filterStatus);
@@ -61,6 +106,7 @@ class Model {
         filterValue: filterValue,
         filterStatus: filterStatus,
       };
+
       this.filter.push(newFilter);
     } else {
       this.filter.forEach((item) => {
@@ -70,9 +116,11 @@ class Model {
       });
     }
 
+    // переделывать хэш по всем актуальным фильтрам, применять если отличается.
+    //this.testCalcHash();
     // render
-    this.view.renderFilters(this);
-    this.view.renderGods(this);
+    //this.view.renderFilters(this);
+    //this.view.renderGods(this);
   }
 
   // Применяет / отменяет фильтр слайдер.
@@ -89,8 +137,9 @@ class Model {
 
     // render
     // обновление счетчиков в блоке фильтров.
-    this.view.updateFiltersCounter(this);
-    this.view.renderGods(this);
+    //this.testCalcHash();
+    // this.view.updateFiltersCounter(this);
+    // this.view.renderGods(this);
   }
 
   // отфильтровать переданный массив товаров с учетом указанного фильтра.
@@ -182,6 +231,19 @@ class Model {
       }
     });
 
+    // проверить, если установлен фильтр с минимальным значением -> вернуть значение из фильтра.
+    if (filterCategory === 'price') {
+      if (this.filterPrice.filterValueMin !== -1) {
+        min = this.filterPrice.filterValueMin;
+      }
+    }
+
+    if (filterCategory === 'stock') {
+      if (this.filterStock.filterValueMin !== -1) {
+        min = this.filterStock.filterValueMin;
+      }
+    }
+
     return min ? min : 0;
   }
 
@@ -197,6 +259,19 @@ class Model {
         }
       }
     });
+
+    // проверить, если установлен фильтр с минимальным значением -> вернуть значение из фильтра.
+    if (filterCategory === 'price') {
+      if (this.filterPrice.filterValueMax !== -1) {
+        max = this.filterPrice.filterValueMax;
+      }
+    }
+
+    if (filterCategory === 'stock') {
+      if (this.filterStock.filterValueMax !== -1) {
+        max = this.filterStock.filterValueMax;
+      }
+    }
 
     return max ? max : 0;
   }
@@ -226,7 +301,7 @@ class Model {
   }
 
   run(): void {
-    this.view.render(this);
+    // this.view.render(this);
   }
 }
 
