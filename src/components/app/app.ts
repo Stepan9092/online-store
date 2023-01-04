@@ -8,9 +8,9 @@ class App {
   private model: Model;
 
   constructor() {
-    this.controller = new Controller();
     this.view = new ViewMain();
     this.model = new Model(this.view);
+    this.controller = new Controller(this.view, this.model);
   }
 
   run(): void {
