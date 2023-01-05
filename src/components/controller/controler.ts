@@ -50,7 +50,11 @@ class Controller {
       if (params.length > 0) {
         params.forEach((param) => {
           const parametr = param.split('=')[0];
-          const value = param.split('=')[1].replace('%20', ' ');
+          let value = param.split('=')[1]; // .replace('%20', ' ');
+
+          if (value) {
+            value = value.replace('%20', ' ');
+          }
 
           if (currentPage[0].params.some((item) => item === parametr)) {
             validParams.push({ parametr: parametr, value: value });
