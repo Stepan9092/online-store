@@ -17,8 +17,8 @@ class ViewCart {
   render(parametr: Array<IParametr>): void {
     const wrapper: HTMLElement | null = document.querySelector('.cart-wrapper');
 
-    // Если .cart-wrapper нету -> страница загружается первый раз, добавляем .cart-wrapper
-    // иначе -> очищаем и перерисовываем.
+    // Если .cart-wrapper нету -> значит страница загружается первый раз, добавляем .cart-wrapper
+    // иначе -> очищаем .cart-wrapper и перерисовываем.
     if (wrapper === null) {
       if (this.main !== null) {
         removeChild(this.main);
