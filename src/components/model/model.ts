@@ -23,7 +23,8 @@ class Model {
     this.filter = new Array<IFilterItems>();
   }
 
-  clearFiler(): void {
+  // сброс всех фильтров
+  resetFiler(): void {
     while (this.filter.length) {
       this.filter.pop();
     }
@@ -63,7 +64,9 @@ class Model {
     return this.prodBase.products.length;
   }
 
-  testCalcHash(): void {
+  // собирает хэш строку из установленных фильтров и сравнивает с текущей,
+  // если они отличаются, обновляет хэш.
+  updateHash(): void {
     let hash = '#/main';
 
     // apply checkbox filters
@@ -75,7 +78,7 @@ class Model {
           hash = hash.indexOf('?') === -1 ? `${hash}?${addHash}` : `${hash}&${addHash}`;
         }
       });
-    console.log(hash);
+    // console.log(hash);
 
     // apply slider filters
     [this.filterPrice, this.filterStock].forEach((filter) => {
@@ -86,10 +89,9 @@ class Model {
         }
       }
     });
+    // console.log(hash);
 
-    console.log(hash);
-
-    if (window.location.hash !== hash) {
+    if (window.location.hash.replace('%20', ' ') !== hash) {
       window.location.hash = hash;
     }
 
@@ -98,7 +100,7 @@ class Model {
 
   // Применяет / отменяет фильтр чекбокс.
   changeFilter(filterCategory: string, filterValue: string, filterStatus: boolean): void {
-    // console.log(filterCategory, filterValue, filterStatus);
+    //console.log(filterCategory, filterValue, filterStatus);
     if (filterStatus === true) {
       const newFilter: IFilterItems = {
         id: this.filter.length,
@@ -115,12 +117,6 @@ class Model {
         }
       });
     }
-
-    // переделывать хэш по всем актуальным фильтрам, применять если отличается.
-    //this.testCalcHash();
-    // render
-    //this.view.renderFilters(this);
-    //this.view.renderGods(this);
   }
 
   // Применяет / отменяет фильтр слайдер.
@@ -134,12 +130,6 @@ class Model {
       this.filterStock.filterValueMax = filterValueMax;
       this.filterStock.filterValueMin = filterValueMin;
     }
-
-    // render
-    // обновление счетчиков в блоке фильтров.
-    //this.testCalcHash();
-    // this.view.updateFiltersCounter(this);
-    // this.view.renderGods(this);
   }
 
   // отфильтровать переданный массив товаров с учетом указанного фильтра.

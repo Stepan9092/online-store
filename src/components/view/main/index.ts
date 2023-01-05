@@ -48,7 +48,7 @@ class ViewMain {
             if (model !== undefined) {
               if (category !== null && name !== null) {
                 model.changeFilter(category, name, target.checked);
-                model.testCalcHash();
+                model.updateHash();
               }
             }
           }
@@ -132,7 +132,7 @@ class ViewMain {
           labelRight.textContent = String(max);
 
           model.changeFilterSlider(id, min, max);
-          model.testCalcHash();
+          model.updateHash();
         }
       });
     });
@@ -140,14 +140,6 @@ class ViewMain {
 
   // Отрисовка всех категорий фильтров.
   renderFilters(model: Model): void {
-    // let filtersBlock: HTMLElement | null = document.querySelector('.main__filter');
-
-    // if (filtersBlock === null) {
-    //   filtersBlock = createElement('div', 'main__filter', this.main);
-    // } else {
-    //   removeChild(filtersBlock);
-    // }
-
     const filtersBlock = createElement('div', 'main__filter', this.main);
 
     const filterControls = createElement('div', 'filter__controls', filtersBlock);
@@ -175,32 +167,8 @@ class ViewMain {
     this.renderFilterSlider(filterStock, 'stock', model);
   }
 
-  // // обновление счетчиков фильтров.
-  // updateFiltersCounter(model: Model): void {
-  //   const filterCategry: HTMLElement | null = document.querySelector('.filter__categry');
-  //   if (filterCategry !== null) {
-  //     removeChild(filterCategry);
-  //     createElement('div', 'filter__caption', filterCategry).textContent = 'Category';
-  //     this.renderFilter(filterCategry, 'category', model);
-  //   }
-
-  //   const filterBrand: HTMLElement | null = document.querySelector('.filter__brand');
-  //   if (filterBrand !== null) {
-  //     removeChild(filterBrand);
-  //     createElement('div', 'filter__caption', filterBrand).textContent = 'Brand';
-  //     this.renderFilter(filterBrand, 'manufacturer', model);
-  //   }
-
-  //   const filterSex: HTMLElement | null = document.querySelector('.filter__sex');
-  //   if (filterSex !== null) {
-  //     removeChild(filterSex);
-  //     createElement('div', 'filter__caption', filterSex).textContent = 'Sex';
-  //     this.renderFilter(filterSex, 'gender', model);
-  //   }
-  // }
-
   // обновление значения и счетчиков блока фильтров.
-  updateFiltersBlock(model: Model): void {
+  updateFilters(model: Model): void {
     const filterCategry: HTMLElement | null = document.querySelector('.filter__categry');
     if (filterCategry !== null) {
       removeChild(filterCategry);
@@ -332,11 +300,7 @@ class ViewMain {
     // если фильтры уже есть то Update иначе Render.
     const filtersBlock: HTMLElement | null = document.querySelector('.main__filter');
 
-    if (filtersBlock === null) {
-      this.renderFilters(model);
-    } else {
-      this.updateFiltersBlock(model);
-    }
+    filtersBlock === null ? this.renderFilters(model) : this.updateFilters(model);
 
     this.renderGods(model);
   }
