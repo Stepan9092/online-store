@@ -20,7 +20,11 @@ export function createElement(
         el.setAttribute(attrName, '');
         return;
       }
-      if (attrName.match(/value|id|href|src|alt|type|name|placeholder|tabindex|for|spellcheck/i)) {
+      if (
+        attrName.match(
+          /value|id|href|src|alt|type|name|placeholder|tabindex|min|max|for|step|spellcheck/i
+        )
+      ) {
         el.setAttribute(attrName, attrValue);
       } else {
         el.dataset[attrName] = attrValue;
@@ -38,3 +42,4 @@ export function removeChild(element: HTMLElement) {
     }
   }
 }
+
