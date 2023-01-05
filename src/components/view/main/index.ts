@@ -6,6 +6,7 @@ import star from '../../../assets/star.png';
 
 class ViewMain {
   private main: HTMLElement | null;
+  private wrapper: HTMLElement | null = null;
 
   constructor() {
     this.main = document.querySelector('main');
@@ -140,7 +141,7 @@ class ViewMain {
 
   // Отрисовка всех категорий фильтров.
   renderFilters(model: Model): void {
-    const filtersBlock = createElement('div', 'main__filter', this.main);
+    const filtersBlock = createElement('div', 'main__filter', this.wrapper);
 
     const filterControls = createElement('div', 'filter__controls', filtersBlock);
     createElement('div', 'control__reset', filterControls);
@@ -278,7 +279,7 @@ class ViewMain {
     let goodsBlock: HTMLElement | null = document.querySelector('.main__products');
 
     if (goodsBlock === null) {
-      goodsBlock = createElement('div', 'main__products', this.main);
+      goodsBlock = createElement('div', 'main__products', this.wrapper);
     } else {
       removeChild(goodsBlock);
     }
@@ -294,7 +295,14 @@ class ViewMain {
     const wrapper: HTMLElement | null = document.querySelector('.main-wrapper');
 
     if (wrapper === null) {
-      this.main = createElement('div', 'main-wrapper', this.main);
+      if (this.main !== null) {
+        removeChild(this.main);
+      }
+
+      this.wrapper = createElement('div', 'main-wrapper', this.main);
+    } else {
+      this.wrapper = wrapper;
+      removeChild(this.wrapper);
     }
 
     // если фильтры уже есть то Update иначе Render.

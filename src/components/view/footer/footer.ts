@@ -6,6 +6,9 @@ class Footer {
 
   constructor() {
     this.container = document.querySelector('footer');
+  }
+
+  run(): void {
     this.createFooter();
   }
 

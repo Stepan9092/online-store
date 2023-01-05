@@ -1,15 +1,18 @@
 import Model from '../model/model';
 import ViewMain from '../view/main/index';
+import ViewCart from '../view/cart/cart';
 import { IPage, IParametr } from '../types/index';
 
 class Controller {
   private view: ViewMain;
+  private viewCart: ViewCart;
   private model: Model;
   private validPage: Array<IPage>;
 
-  constructor(view: ViewMain, model: Model) {
+  constructor(view: ViewMain, model: Model, viewCart: ViewCart) {
     this.model = model;
     this.view = view;
+    this.viewCart = viewCart;
 
     // описание валидных страниц и их параметров.
     this.validPage = new Array<IPage>();
@@ -23,7 +26,7 @@ class Controller {
     });
     this.validPage.push({
       page: 'cart',
-      params: [],
+      params: ['limit', 'page'],
     });
   }
 
@@ -60,6 +63,7 @@ class Controller {
     if (this.isPageValid(page)) {
       const validParams = this.getValidParams(page, params);
 
+      console.log(page);
       // render main page
       if (page === 'main') {
         this.view.render(this.model);
@@ -89,7 +93,12 @@ class Controller {
             );
           });
 
+        console.log('test!');
         this.model.updateHash();
+      }
+
+      if (page === 'cart') {
+        this.viewCart.render(validParams);
       }
     } else {
       // render 404

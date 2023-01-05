@@ -7,6 +7,9 @@ class Header {
 
   constructor() {
     this.container = document.querySelector('header');
+  }
+
+  run(): void {
     this.createHeader();
     this.onClickBasket();
   }
@@ -16,6 +19,7 @@ class Header {
     const wrapper = createElement('div', 'header-wrapper', this.container);
     const logo = createElement('div', 'header__logo', wrapper);
     createElement('img', 'header__img', logo, ['alt', 'logo picture'], ['src', logoPicture]);
+    logo.addEventListener('click', () => (window.location.hash = '/main'));
     const sum = createElement('div', 'header__sum', wrapper);
     const sumText = createElement('span', 'header__sumText', sum);
     sumText.innerText = 'Cart total: ';
@@ -36,7 +40,7 @@ class Header {
 
   onClickBasket() {
     document.querySelector('.header__basket')?.addEventListener('click', () => {
-      window.location.hash = 'cart';
+      window.location.hash = '/cart';
     });
   }
 
