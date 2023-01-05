@@ -1,7 +1,6 @@
-import logoPicture from '../../assets/logo-header.png';
-import cartIconPicture from '../../assets/icon-cart.png';
-import { createElement } from '../helper/index';
-import './header.scss';
+import logoPicture from '../../../assets/logo-header.png';
+import cartIconPicture from '../../../assets/icon-cart.png';
+import { createElement } from '../../helper/index';
 
 class Header {
   container: HTMLElement | null;

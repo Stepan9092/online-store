@@ -1,6 +1,5 @@
-import { createElement } from '../helper/index';
-import './footer.scss';
-import githubPicture from '../../assets/githubIcon.png';
+import { createElement } from '../../helper/index';
+import githubPicture from '../../../assets/githubIcon.png';
 
 class Footer {
   container: HTMLElement | null;

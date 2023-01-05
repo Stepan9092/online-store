@@ -1,8 +1,8 @@
 import Model from '../model/model';
 import ViewMain from '../view/main/index';
 import Controller from '../controller/controler';
-import Header from '../../components/header/header';
-import Footer from '../../components/footer/footer';
+import Header from '../view/header/header';
+import Footer from '../view/footer/footer';
 
 class App {
   private controller: Controller;

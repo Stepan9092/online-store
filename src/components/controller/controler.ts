@@ -1,15 +1,6 @@
 import Model from '../model/model';
 import ViewMain from '../view/main/index';
-
-interface IPage {
-  page: string;
-  params: Array<string>;
-}
-
-interface IParametr {
-  parametr: string;
-  value: string;
-}
+import { IPage, IParametr } from '../types/index';
 
 class Controller {
   private view: ViewMain;

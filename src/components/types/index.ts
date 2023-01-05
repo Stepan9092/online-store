@@ -31,3 +31,13 @@ export interface IFilterItemSlider {
   filterValueMin: number;
   filterValueMax: number;
 }
+
+export interface IPage {
+  page: string;
+  params: Array<string>;
+}
+
+export interface IParametr {
+  parametr: string;
+  value: string;
+}
