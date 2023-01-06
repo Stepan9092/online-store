@@ -11,6 +11,39 @@
       min-width: 220px;
       height: 100%;
 
+      .filter__controls {
+        font-family: 'Amazon Ember';
+
+        height: 20px;
+        width: 100%;
+
+        margin: 5px 0;
+
+        display: flex;
+        justify-content: space-between;
+
+        .control__reset,
+        .control__copy {
+            display: flex;
+            justify-content: center;
+
+            width: 45%;
+            height: 100%;
+            background-color: #eeecec;
+            border: 1px solid #bebebe;
+            border-radius: 5px;
+
+            cursor: pointer;
+
+            transition: transform 0.2s linear;
+        }
+
+        .control__reset:hover,
+        .control__copy:hover {
+            transform: scale(1.1);
+        }
+      }
+
       .filter {
           font-family: 'Amazon Ember';
           .filter__caption{

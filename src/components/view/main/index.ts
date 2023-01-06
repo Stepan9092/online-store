@@ -86,7 +86,8 @@ class ViewMain {
       currentMinValue = min;
     }
 
-    const step = id === 'price' ? 0.1 : 1;
+    const step = id === 'price' ? 1 : 1;
+    // const step = id === 'price' ? 0.1 : 1;
 
     const multiRange = createElement('div', 'multi__range', parent);
     const inputLower = createElement(
@@ -144,8 +145,13 @@ class ViewMain {
     const filtersBlock = createElement('div', 'main__filter', this.wrapper);
 
     const filterControls = createElement('div', 'filter__controls', filtersBlock);
-    createElement('div', 'control__reset', filterControls);
-    createElement('div', 'control__copy', filterControls);
+    const constrolReset = createElement('div', 'control__reset', filterControls);
+    constrolReset.textContent = 'Reset filter';
+
+    constrolReset.addEventListener('click', () => (document.location.hash = '#/main'));
+
+    const controlCopy = createElement('div', 'control__copy', filterControls);
+    controlCopy.textContent = 'Copy URL';
 
     const filterCategry = createElement('div', 'filter filter__categry', filtersBlock);
     createElement('div', 'filter__caption', filterCategry).textContent = 'Category';
