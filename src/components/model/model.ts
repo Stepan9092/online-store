@@ -89,7 +89,7 @@ class Model {
         }
       }
     });
-    console.log(window.location.hash, hash);
+    // console.log(window.location.hash, hash);
 
     if (window.location.hash.replace('%20', ' ') !== hash) {
       window.location.hash = hash;

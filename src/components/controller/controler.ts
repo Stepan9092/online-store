@@ -63,7 +63,7 @@ class Controller {
     if (this.isPageValid(page)) {
       const validParams = this.getValidParams(page, params);
 
-      console.log(page);
+      // console.log(page);
       // render main page
       if (page === 'main') {
         this.view.render(this.model);
@@ -93,7 +93,7 @@ class Controller {
             );
           });
 
-        console.log('test!');
+        // console.log('test!');
         this.model.updateHash();
       }
 
@@ -131,7 +131,7 @@ class Controller {
   }
 
   run(): void {
-    console.log('run controller');
+    // console.log('run controller');
     this.hashChangeHendler();
 
     if (window.location.hash === '') {

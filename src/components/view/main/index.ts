@@ -193,12 +193,16 @@ class ViewMain {
 
     const filterPrice: HTMLElement | null = document.querySelector('.filter__price');
     if (filterPrice !== null) {
-      const lower: HTMLElement | null = document.getElementById('price__lower');
-      const upper: HTMLElement | null = document.getElementById('price__upper');
+      const lower: HTMLInputElement | null = document.getElementById(
+        'price__lower'
+      ) as HTMLInputElement;
+      const upper: HTMLInputElement | null = document.getElementById(
+        'price__upper'
+      ) as HTMLInputElement;
 
       if (lower !== null && upper !== null) {
-        lower.setAttribute('value', String(model.getCurrentMinValues('price')));
-        upper.setAttribute('value', String(model.getCurrentMaxValues('price')));
+        lower.value = String(model.getCurrentMinValues('price'));
+        upper.value = String(model.getCurrentMaxValues('price'));
       }
 
       const lowerLabel: HTMLElement | null = filterPrice.querySelector('.multi__range_label-left');
@@ -212,12 +216,16 @@ class ViewMain {
 
     const filterStock: HTMLElement | null = document.querySelector('.filter__stock');
     if (filterStock !== null) {
-      const lower: HTMLElement | null = document.getElementById('stock__lower');
-      const upper: HTMLElement | null = document.getElementById('stock__upper');
+      const lower: HTMLInputElement | null = document.getElementById(
+        'stock__lower'
+      ) as HTMLInputElement;
+      const upper: HTMLInputElement | null = document.getElementById(
+        'stock__upper'
+      ) as HTMLInputElement;
 
       if (lower !== null && upper !== null) {
-        lower.setAttribute('value', String(model.getCurrentMinValues('stock')));
-        upper.setAttribute('value', String(model.getCurrentMaxValues('stock')));
+        lower.value = String(model.getCurrentMinValues('stock'));
+        upper.value = String(model.getCurrentMaxValues('stock'));
       }
 
       const lowerLabel: HTMLElement | null = filterStock.querySelector('.multi__range_label-left');
@@ -302,7 +310,13 @@ class ViewMain {
       this.wrapper = createElement('div', 'main-wrapper', this.main);
     } else {
       this.wrapper = wrapper;
-      removeChild(this.wrapper);
+      // removeChild(this.wrapper);
+      // const child = document.querySelectorAll('main > *:not(.main-wrapper)');
+      // child.forEach((item) => {
+      //   if (this.wrapper) {
+      //     this.wrapper.removeChild(item);
+      //   }
+      // });
     }
 
     // если фильтры уже есть то Update иначе Render.
