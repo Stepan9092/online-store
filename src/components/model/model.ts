@@ -290,6 +290,18 @@ class Model {
     return tempBase;
   }
 
+  // получение списка товаров по id
+  getGoodsByIPs(IPs: Array<string>): IProducts {
+    const tempBase: IProducts = {
+      products: this.prodBase.products.filter((item) => IPs.includes(String(item.id))),
+    };
+    return tempBase;
+  }
+
+  changeHashCart(page: number, limit: number) {
+    window.location.hash = `#cart?page=${page}&limit=${limit}`;
+  }
+
   run(): void {
     // this.view.render(this);
   }

@@ -1,0 +1,127 @@
+.cart-wrapper {
+  font-family: 'Amazon Ember';
+  min-height: calc(100vh - 160px);
+  display: flex;
+  gap: 15px;
+  margin: 20px auto;
+  padding: 0 20px;
+  max-width: 1500px;
+}
+
+.cart-empty__title{
+  text-align: center;
+  width: 100%;
+  font-size: 28px;
+}
+
+.cart {
+  width: 69%;
+  height: 100%;
+
+  .cart__header {
+    padding: 0 20px;
+    background-color: #f5f5f5;
+    // #c5c5c5
+    display: flex;
+    align-items: center;
+    height: 50px;
+    justify-content: space-between;
+  }
+
+  .cart__params {
+    display: flex;
+    gap: 10px;
+  }
+
+  .cart-item__image {
+    width: 100px;
+  }
+
+  .cart-item {
+    padding: 0 10px;
+    border: 1px solid #f5f5f5;
+    border-top: none;
+    height: 100px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .cart-item__index{
+    width: 15px;
+  }
+
+  .cart-item__info {
+    height: 100%;
+    display: flex;
+    flex-grow: 1;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .cart-item__container {
+    flex-grow: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+
+  .cart-item__name {
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .cart-item__description {
+    font-size: 10px;
+    text-align: center;
+  }
+
+  .cart-item__addInfo{
+    display: flex;
+    justify-content: space-around;
+    font-size: 12px;
+  }
+
+  .cart-item__control{
+    min-width: 70px;
+    font-size: 12px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .cart-item__numberControl{
+    display: flex;
+    gap: 4px;
+  }
+  .cart-item__numberPlus, .cart-item__numberMinus{
+    cursor: pointer;
+    border: none;
+    background-color: #f5f5f5;
+  }
+}
+
+.limit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  .limit__input {
+    border: 1px solid #f5f5f5;
+    width: 35px;
+  }
+}
+
+.page {
+  display: flex;
+  align-items: center;
+
+  .page__btn-prev,
+  .page__btn-next {
+    background: inherit;
+    border: none;
+    cursor: pointer;
+  }
+}
