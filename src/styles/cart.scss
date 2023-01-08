@@ -140,11 +140,18 @@
     height: 50px;
     justify-content: center;
     align-items: center;
+    font-size: 14px;
     .summary__title{
       font-size: 14px;
     }
   }
+  .summary__enteredCode{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
   .summary__total{
+    font-size: 14px;
     border: 1px solid #f5f5f5;
     padding: 20px 0;
     display: flex;
@@ -152,13 +159,24 @@
     gap: 10px;
     align-items: center;
   }
+  .summary__btn{
+    border: 1px solid #c5c5c5;
+    background-color: #f5f5f5;
+    cursor: pointer;
+    height: 30px;
+  }
+  .summary__total-crossline{
+    text-decoration: line-through;
+  }
 }
 
 .promo{
-  width: 70%;
-  .promo__item{
-    display: flex;
+  .promo__btn{
+    border: 1px solid #c5c5c5;
+    background-color: #f5f5f5;
+    cursor: pointer;
   }
+  width: 70%;
   .promo__header{
     display: flex;
     align-items: center;
@@ -171,7 +189,7 @@
     border: 1px solid #f5f5f5;
   }
   .promo__item{
-    padding: 0 15px;
+    padding: 5px 15px;
     display: flex;
     justify-content: space-between;
     align-items: center;

@@ -15,6 +15,10 @@ export interface IProduct {
   images: Array<string>;
 }
 
+export interface ICartProduct extends IProduct{
+  count: number;
+}
+
 export interface IProducts {
   products: Array<IProduct>;
 }

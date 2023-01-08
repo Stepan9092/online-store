@@ -1,6 +1,6 @@
 import Model from '../../model/model';
 import { createElement, removeChild } from '../../helper/index';
-import { IParametr, IProduct, IPromo } from '../../types/index';
+import { ICartProduct, IParametr, IProduct, IPromo } from '../../types/index';
 
 class ViewCart {
   private wrapper: HTMLElement | null = null;
@@ -10,7 +10,7 @@ class ViewCart {
     this.main = document.querySelector('main');
   }
 
-  renderCart(items: Array<IProduct>, parametr: Array<IParametr>, model: Model) {
+  renderCart(items: Array<ICartProduct>, parametr: Array<IParametr>, model: Model) {
     let limit = 3;
     let page = 1;
 
@@ -19,8 +19,7 @@ class ViewCart {
       if (item['parametr'] === 'page') page = Number(item['value']);
     });
 
-    const itemsLength = items.length;
-    items = items.filter(
+    const itemsPage = items.filter(
       (item: IProduct, index: number) => index >= (page - 1) * limit && index < page * limit
     );
 
@@ -44,7 +43,7 @@ class ViewCart {
       'input',
       'limit__input',
       limitBlock,
-      ['max', `${itemsLength}`],
+      ['max', `${items.length}`],
       ['min', '1'],
       ['type', 'number'],
       ['value', `${limit}`]
@@ -52,7 +51,7 @@ class ViewCart {
 
     limitInput.addEventListener('change', (e) => {
       limit = Number((e.target as HTMLInputElement).value);
-      while (itemsLength <= (page - 1) * limit) {
+      while (items.length <= (page - 1) * limit) {
         page = page - 1;
       }
       model.changeHashCart(page, limit);
@@ -74,20 +73,20 @@ class ViewCart {
     const nextPage = createElement('button', 'page__btn-next', pageBlock);
     nextPage.textContent = '>';
     nextPage.addEventListener('click', () => {
-      if (page * limit < itemsLength) {
+      if (page * limit < items.length) {
         page = page + 1;
         model.changeHashCart(page, limit);
       }
     });
 
     const cartList = createElement('div', 'cart__list', cartBlock);
-    items.forEach((item: IProduct, index) => {
-      this.renderProduct(parametr, model, item, index, page, limit, 1, cartList);
+    itemsPage.forEach((item: ICartProduct, index) => {
+      this.renderProduct(parametr, model, item, index, page, limit, cartList);
     });
   }
 
   renderSummary(
-    items: Array<IProduct>,
+    items: Array<ICartProduct>,
     promocods: Array<IPromo>,
     apliedPromocods: Array<IPromo> = []
   ) {
@@ -100,13 +99,21 @@ class ViewCart {
     summaryTitle.textContent = 'Summary';
     const summaryTotal = createElement('div', 'summary__total', summary);
     const summaryProducts = createElement('div', 'summary__products', summaryTotal);
-    summaryProducts.textContent = `Products: ${items.length}`;
+    const totalProducts = items.reduce((prev, el) => prev + el.count, 0);
+    summaryProducts.textContent = `Products: ${totalProducts}`;
     const summaryPrice = createElement('div', 'summary__price', summaryTotal);
-    const sumTotal = items.reduce(
-      (prev, item) => prev + item.price * ((100 - item.discountPercentage) / 100),
-      0
-    );
+    const sumTotal = items.reduce((prev, item) => prev + item.price * item.count, 0);
     summaryPrice.textContent = `Total: ${Number(sumTotal).toFixed(2)}$`;
+    if (apliedPromocods.length !== 0) {
+      const summaryPriceDiscount = createElement('div', 'summary__price', summaryTotal);
+      const discountPercentage = apliedPromocods.reduce(
+        (prev, next) => prev + Number(next.discount),
+        0
+      );
+      const sumDiscount = (sumTotal * (100 - discountPercentage)) / 100;
+      summaryPriceDiscount.textContent = `Total: ${sumDiscount.toFixed(2)}$`;
+      summaryPrice.classList.add('summary__total-crossline');
+    }
 
     if (apliedPromocods.length !== 0) {
       const promo = createElement('div', 'promo', summaryTotal);
@@ -131,8 +138,24 @@ class ViewCart {
     }
 
     const inputCode = createElement('input', 'summary__input', summaryTotal, ['type', 'text']);
+    const enteredCodeBlock = createElement('div', 'summary__enteredCode', summaryTotal);
     inputCode.addEventListener('input', (e) => {
-      // console.log(e.target.value);
+      const enteredValue = (e.target as HTMLInputElement).value;
+      const enteredCode = <IPromo>promocods.find((el) => el.code === enteredValue.toUpperCase());
+      if (enteredCode) {
+        const enteredCodeText = createElement('div', 'promo__text', enteredCodeBlock);
+        enteredCodeText.textContent = `${enteredCode.title} - ${enteredCode.discount}%`;
+        if (!apliedPromocods.find((el) => el.code === enteredCode.code)) {
+          const enteredCodeBtn = createElement('button', 'promo__btn', enteredCodeBlock);
+          enteredCodeBtn.textContent = 'add';
+          enteredCodeBtn.addEventListener('click', () => {
+            apliedPromocods.push(enteredCode);
+            this.renderSummary(items, promocods, apliedPromocods);
+          });
+        }
+      } else {
+        removeChild(enteredCodeBlock);
+      }
     });
 
     const summatyText = createElement('div', 'summary__text', summaryTotal);
@@ -144,11 +167,10 @@ class ViewCart {
   renderProduct(
     parametr: Array<IParametr>,
     model: Model,
-    item: IProduct,
+    item: ICartProduct,
     index: number,
     page: number,
     limit: number,
-    amount: number,
     parent: HTMLElement
   ) {
     const product = createElement('div', 'cart-item', parent);
@@ -183,19 +205,20 @@ class ViewCart {
     minusCount.textContent = '-';
     minusCount.addEventListener('click', () => {
       /*
-
+        удаление элемента из localStorage
       */
       this.render(parametr, model);
     });
     const count = createElement('span', 'cart-item__count', numberControl);
-    count.textContent = `${amount}`;
+    count.textContent = `${item.count}`;
     const plusCount = createElement('button', 'cart-item__numberPlus', numberControl);
     plusCount.textContent = '+';
     plusCount.addEventListener('click', () => {
-      /*
-
-      */
-      this.render(parametr, model);
+      if (item.count + 1 <= item.stock)
+        /*
+        добавление элемента в localStorage
+        */
+        this.render(parametr, model);
     });
     const price = createElement('div', 'cart-item__price', countControl);
     price.textContent = `${((item.price * (100 - item.discountPercentage)) / 100).toFixed(2)}$`;
@@ -217,27 +240,30 @@ class ViewCart {
       removeChild(this.wrapper);
     }
 
-    const items: Array<IProduct> = model.getGoodsByIPs([
-      '1',
-      '2',
-      '3',
-      '4',
-      '5',
-      '6',
-      '7',
-    ]).products;
+    // пример данных с localStorage
+    const data = [
+      { id: '1', count: '4' },
+      { id: '2', count: '4' },
+      { id: '3', count: '4' },
+      { id: '4', count: '4' },
+      { id: '14', count: '2' },
+      { id: '11', count: '4' },
+      { id: '31', count: '2' },
+    ];
+
+    const items: Array<ICartProduct> = model
+      .getGoodsByIPs(data.map((el) => el.id))
+      .products.map((el, index) => {
+        return { ...el, count: Number(data[index].count) };
+      });
+
+    const promocods: Array<IPromo> = [
+      { code: 'RS', discount: '10', title: 'rolling scopes school' },
+      { code: 'YEAH', discount: '10', title: 'yeah' },
+    ];
+
     this.renderCart(items, parametr, model);
-    this.renderSummary(
-      items,
-      [
-        { code: 'RS', discount: '10', title: 'rolling scopes school' },
-        { code: 'YEAH', discount: '10', title: 'yeah' },
-      ],
-      [
-        { code: 'RS', discount: '10', title: 'rolling scopes school' },
-        { code: 'YEAH', discount: '10', title: 'yeah' },
-      ]
-    );
+    this.renderSummary(items, promocods);
   }
 }
 
