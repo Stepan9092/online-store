@@ -299,7 +299,7 @@ class Model {
   }
 
   changeHashCart(page: number, limit: number) {
-    window.location.hash = `#cart?page=${page}&limit=${limit}`;
+    window.location.hash = `#/cart?page=${page}&limit=${limit}`;
   }
 
   run(): void {

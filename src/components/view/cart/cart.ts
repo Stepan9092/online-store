@@ -1,6 +1,6 @@
 import Model from '../../model/model';
 import { createElement, removeChild } from '../../helper/index';
-import { IParametr, IProduct } from '../../types/index';
+import { IParametr, IProduct, IPromo } from '../../types/index';
 
 class ViewCart {
   private wrapper: HTMLElement | null = null;
@@ -10,7 +10,7 @@ class ViewCart {
     this.main = document.querySelector('main');
   }
 
-  renderCart(parametr: Array<IParametr>, model: Model) {
+  renderCart(items: Array<IProduct>, parametr: Array<IParametr>, model: Model) {
     let limit = 3;
     let page = 1;
 
@@ -18,8 +18,6 @@ class ViewCart {
       if (item['parametr'] === 'limit') limit = Number(item['value']);
       if (item['parametr'] === 'page') page = Number(item['value']);
     });
-
-    let items: Array<IProduct> = model.getGoodsByIPs(['1', '2', '3', '4', '5', '6', '7']).products;
 
     const itemsLength = items.length;
     items = items.filter(
@@ -88,9 +86,47 @@ class ViewCart {
     });
   }
 
-  // renderSummary() {
+  renderSummary(
+    items: Array<IProduct>,
+    promocods: Array<IPromo>,
+    apliedPromocods: Array<IPromo> = []
+  ) {
+    const summary = createElement('div', 'summary', this.wrapper);
+    const summaryHeader = createElement('div', 'summary__header', summary);
+    const summaryTitle = createElement('div', 'summary__header', summaryHeader);
+    summaryTitle.textContent = 'Summary';
+    const summaryTotal = createElement('div', 'summary__total', summary);
+    const summaryProducts = createElement('div', 'summary__products', summaryTotal);
+    summaryProducts.textContent = `Products: ${items.length}`;
+    const summaryPrice = createElement('div', 'summary__price', summaryTotal);
+    const sumTotal = items.reduce(
+      (prev, item) => prev + item.price * ((100 - item.discountPercentage) / 100),
+      0
+    );
+    summaryPrice.textContent = `Total: ${Number(sumTotal).toFixed(2)}$`;
 
-  // }
+    if (apliedPromocods.length !== 0) {
+      const promo = createElement('div', 'promo', summaryTotal);
+      const promoHeader = createElement('div', 'promo__header', promo);
+      promoHeader.textContent = 'Applied codes';
+
+      const promoItems = createElement('div', 'promo__items', promo);
+      apliedPromocods.forEach((item) => {
+        const promoItem = createElement('div', 'promo__item', promoItems);
+        const promoText = createElement('div', 'promo__text', promoItem);
+        promoText.textContent = `${item.title} - ${item.discount}%`;
+        const promoBtn = createElement('button', 'promo__btn', promoItem);
+        promoBtn.textContent = 'drop';
+      });
+    }
+
+    const inputCode = createElement('input', 'summary__input', summaryTotal, ['type', 'text']);
+
+    const summatyText = createElement('div', 'summary__text', summaryTotal);
+    summatyText.textContent = `Promo for test: 'RS', 'YEAH'`;
+    const buyBtn = createElement('button', 'summary__btn', summaryTotal);
+    buyBtn.textContent = 'BUY NOW';
+  }
 
   renderProduct(
     parametr: Array<IParametr>,
@@ -168,7 +204,27 @@ class ViewCart {
       removeChild(this.wrapper);
     }
 
-    this.renderCart(parametr, model);
+    const items: Array<IProduct> = model.getGoodsByIPs([
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+    ]).products;
+    this.renderCart(items, parametr, model);
+    this.renderSummary(
+      items,
+      [
+        { code: 'RS', discount: '10', title: 'rolling scopes school' },
+        { code: 'YEAH', discount: '10', title: 'yeah' },
+      ],
+      [
+        { code: 'RS', discount: '10', title: 'rolling scopes school' },
+        { code: 'YEAH', discount: '10', title: 'yeah' },
+      ]
+    );
   }
 }
 

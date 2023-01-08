@@ -41,3 +41,9 @@ export interface IParametr {
   parametr: string;
   value: string;
 }
+
+export interface IPromo {
+  code: string;
+  discount: string;
+  title: string;
+}
