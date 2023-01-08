@@ -22,7 +22,7 @@ export function createElement(
       }
       if (
         attrName.match(
-          /value|id|href|src|alt|type|name|placeholder|tabindex|min|max|for|step|spellcheck/i
+          /value|id|href|src|alt|type|name|placeholder|tabindex|min|max|for|step|selected|spellcheck/i
         )
       ) {
         el.setAttribute(attrName, attrValue);
