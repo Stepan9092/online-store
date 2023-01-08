@@ -1,1 +1,9 @@
 @import '~normalize.css';
+@import './styles/fonts.scss';
+@import './styles/header.scss';
+@import './styles/main.scss';
+@import './styles/footer.scss';
+
+html{
+    overflow: visible;
+}
