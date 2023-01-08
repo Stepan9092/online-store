@@ -153,6 +153,15 @@ class ViewMain {
     const controlCopy = createElement('div', 'control__copy', filterControls);
     controlCopy.textContent = 'Copy URL';
 
+    controlCopy.addEventListener('click', () => {
+      navigator.clipboard.writeText(location.href);
+      controlCopy.textContent = 'Copied!!!';
+
+      setTimeout(() => {
+        controlCopy.textContent = 'Copy URL';
+      }, 2000);
+    });
+
     const filterCategry = createElement('div', 'filter filter__categry', filtersBlock);
     createElement('div', 'filter__caption', filterCategry).textContent = 'Category';
     this.renderFilter(filterCategry, 'category', model);
@@ -175,7 +184,7 @@ class ViewMain {
   }
 
   // обновление значения и счетчиков блока фильтров.
-  updateFilters(model: Model): void {
+  private updateFilters(model: Model): void {
     const filterCategry: HTMLElement | null = document.querySelector('.filter__categry');
     if (filterCategry !== null) {
       removeChild(filterCategry);
@@ -244,11 +253,28 @@ class ViewMain {
     }
   }
 
+  private updateGoodsControls(model: Model): void {
+    const currentSort = model.getCurrentSort();
+    const select = document.querySelectorAll('.goods__sort-select > option');
+
+    select.forEach((item, index) => {
+      const currentItem: HTMLOptionElement = item as HTMLOptionElement;
+      currentItem.selected = index === currentSort ? true : false;
+    });
+
+    const input: HTMLInputElement | null = document.querySelector('.goods__search');
+
+    if (input !== null) {
+      input.value = model.getCurrentSearch();
+    }
+  }
+
   // отрисовка единицы товара
   private renderGodsCard(parrent: HTMLElement | null, item: IProduct): void {
     const prodItem = createElement('div', 'product__item', parrent);
     const itemImage = createElement('div', 'item__image', prodItem);
     itemImage.style.backgroundImage = `url(${item.thumbnail})`;
+    itemImage.addEventListener('click', () => (document.location.hash = '#/goods?id=' + item.id));
     const itemInfoBlock = createElement('div', 'item__info-block', prodItem);
     const infoCaption = createElement('div', 'info__caption', itemInfoBlock);
     createElement('span', 'caption__brand', infoCaption).textContent = item.manufacturer;
@@ -285,23 +311,95 @@ class ViewMain {
       createElement('span', 'price__discont', infoPrice);
     }
     const infoBlockRight = createElement('div', 'info__block-right', infoBlock);
-    createElement('div', 'add-to-cart_control', infoBlockRight);
+    const cartButton = createElement('div', 'add-to-cart_control', infoBlockRight);
+
+    cartButton.addEventListener('click', () => {
+      console.log('add to cart => ', item.id);
+    });
+  }
+
+  private renderControls(model: Model): void {
+    const goodsBlock: HTMLElement | null = document.querySelector('.main__goods');
+
+    // добавить панель с элементами управления.
+    const controlWrapper: HTMLElement = createElement('div', 'goods__controls', goodsBlock);
+
+    const currentSort = model.getCurrentSort();
+
+    const select = createElement('select', 'goods__sort-select', controlWrapper, ['name', 'sort']);
+    [
+      'Sort option:',
+      'Sort by price &uarr;',
+      'Sort by price &darr;',
+      'Sort by stock &uarr;',
+      'Sort by stock &darr;',
+    ].forEach((item, index) => {
+      if (currentSort === index) {
+        createElement(
+          'option',
+          '',
+          select,
+          ['selected', 'selected'],
+          ['value', String(index)]
+        ).innerHTML = item;
+      } else {
+        createElement('option', '', select, ['value', String(index)]).innerHTML = item;
+      }
+    });
+
+    select.addEventListener('input', (event: Event) => {
+      const target: HTMLSelectElement | null = event.target as HTMLSelectElement;
+      if (HTMLSelectElement !== null) {
+        model.changeSort(Number(target.value));
+        model.updateHash();
+      }
+    });
+
+    const found = createElement('div', 'goods__found', controlWrapper);
+    createElement('div', 'goods__found-text', found).textContent = 'Found:  ';
+    const goodCount = createElement('div', 'goods__found-count', found);
+    goodCount.textContent = ' 0 ';
+
+    const input: HTMLInputElement = createElement('input', 'goods__search', controlWrapper, [
+      'type',
+      'text',
+    ]) as HTMLInputElement;
+    input.placeholder = 'Search product';
+    input.value = model.getCurrentSearch();
+
+    input.addEventListener('input', () => {
+      model.changeSearch(input.value);
+      model.updateHash();
+    });
   }
 
   // отрисовка блока товаров
   renderGods(model: Model): void {
-    let goodsBlock: HTMLElement | null = document.querySelector('.main__products');
+    const goodsBlock: HTMLElement | null = document.querySelector('.main__goods');
 
-    if (goodsBlock === null) {
-      goodsBlock = createElement('div', 'main__products', this.wrapper);
-    } else {
-      removeChild(goodsBlock);
+    if (goodsBlock !== null) {
+      const items: IProducts = model.getGoods();
+
+      if (items.products.length > 0) {
+        let prodBlock: HTMLElement | null = document.querySelector('.main__products');
+
+        if (prodBlock === null) {
+          prodBlock = createElement('div', 'main__products', goodsBlock);
+        }
+
+        items.products.forEach((item: IProduct) => {
+          this.renderGodsCard(prodBlock, item);
+        });
+      } else {
+        createElement('div', 'goods__not-found', goodsBlock).innerHTML =
+          'No products found &#128546';
+      }
+
+      const goodCount = document.querySelector('.goods__found-count');
+      if (goodCount !== null) {
+        goodCount.textContent = String(items.products.length);
+      }
     }
-
-    const items: IProducts = model.getGoods();
-    items.products.forEach((item: IProduct) => {
-      this.renderGodsCard(goodsBlock, item);
-    });
   }
 
   // Отрисовка главной страницы
@@ -316,19 +414,28 @@ class ViewMain {
       this.wrapper = createElement('div', 'main-wrapper', this.main);
     } else {
       this.wrapper = wrapper;
-      // removeChild(this.wrapper);
-      // const child = document.querySelectorAll('main > *:not(.main-wrapper)');
-      // child.forEach((item) => {
-      //   if (this.wrapper) {
-      //     this.wrapper.removeChild(item);
-      //   }
-      // });
     }
 
     // если фильтры уже есть то Update иначе Render.
     const filtersBlock: HTMLElement | null = document.querySelector('.main__filter');
 
     filtersBlock === null ? this.renderFilters(model) : this.updateFilters(model);
+
+    const goodsBlock: HTMLElement | null = document.querySelector('.main__goods');
+
+    if (goodsBlock === null) {
+      createElement('div', 'main__goods', this.wrapper);
+      this.renderControls(model);
+    } else {
+      const mainProducts = goodsBlock.querySelector('.main__products') as HTMLElement;
+
+      goodsBlock.querySelector('.goods__not-found')?.remove();
+
+      if (mainProducts !== null) {
+        removeChild(mainProducts);
+        this.updateGoodsControls(model);
+      }
+    }
 
     this.renderGods(model);
   }

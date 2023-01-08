@@ -18,7 +18,7 @@ class Controller {
     this.validPage = new Array<IPage>();
     this.validPage.push({
       page: 'main',
-      params: ['category', 'manufacturer', 'gender', 'price', 'stock'],
+      params: ['category', 'manufacturer', 'gender', 'price', 'stock', 'sort', 'search'],
     });
     this.validPage.push({
       page: 'goods',
@@ -91,6 +91,24 @@ class Controller {
               Number(item.value.split('|')[0]),
               Number(item.value.split('|')[1])
             );
+          });
+
+        // установить тип сортировки
+        validParams
+          .filter((filterItem) => {
+            return ['sort'].some((someItem) => someItem === filterItem.parametr);
+          })
+          .forEach((item) => {
+            this.model.changeSort(Number(item.value));
+          });
+
+        // установить текстовый поиск
+        validParams
+          .filter((filterItem) => {
+            return ['search'].some((someItem) => someItem === filterItem.parametr);
+          })
+          .forEach((item) => {
+            this.model.changeSearch(item.value);
           });
 
         // console.log('test!');

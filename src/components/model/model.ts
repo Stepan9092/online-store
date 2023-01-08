@@ -16,6 +16,8 @@ class Model {
     filterValueMin: -1,
     filterValueMax: -1,
   };
+  private sortType = 0;
+  private textSearch = '';
 
   constructor(view: ViewMain) {
     this.view = view;
@@ -34,6 +36,9 @@ class Model {
 
     this.filterStock.filterValueMin = -1;
     this.filterStock.filterValueMax = -1;
+
+    this.sortType = 0;
+    this.textSearch = '';
   }
 
   // получить массив строк - фильтров
@@ -91,6 +96,22 @@ class Model {
     });
     // console.log(window.location.hash, hash);
 
+    // apply sort type
+    if (this.sortType !== 0) {
+      const addHash = `sort=${this.sortType}`;
+      if (hash.indexOf(addHash) === -1) {
+        hash = hash.indexOf('?') === -1 ? `${hash}?${addHash}` : `${hash}&${addHash}`;
+      }
+    }
+
+    // apply search
+    if (this.textSearch !== '') {
+      const addHash = `search=${this.textSearch}`;
+      if (hash.indexOf(addHash) === -1) {
+        hash = hash.indexOf('?') === -1 ? `${hash}?${addHash}` : `${hash}&${addHash}`;
+      }
+    }
+
     if (window.location.hash.replace('%20', ' ') !== hash) {
       window.location.hash = hash;
     }
@@ -130,6 +151,25 @@ class Model {
       this.filterStock.filterValueMax = filterValueMax;
       this.filterStock.filterValueMin = filterValueMin;
     }
+  }
+
+  // меняет тип сортировки
+  changeSort(sortType: number): void {
+    this.sortType = sortType;
+  }
+
+  // возвращает текущий тип сортировки.
+  getCurrentSort(): number {
+    return this.sortType;
+  }
+
+  changeSearch(textSearch: string): void {
+    this.textSearch = textSearch;
+  }
+
+  // возвращает текущий тип сортировки.
+  getCurrentSearch(): string {
+    return this.textSearch;
   }
 
   // отфильтровать переданный массив товаров с учетом указанного фильтра.
@@ -266,16 +306,60 @@ class Model {
     return max ? max : 0;
   }
 
+  // сортировка
+  private sortGoods(currentBase: IProducts): void {
+    switch (this.sortType) {
+      case 0:
+        break;
+      case 1: //1 'Sort by price &uarr;', - от наибольшего к наименьшему.
+        {
+          currentBase.products = currentBase.products.sort((a, b) => b.price - a.price);
+        }
+        break;
+      case 2: //2 'Sort by price &darr;', - от наименьшего к наибольшему.
+        {
+          currentBase.products = currentBase.products.sort((a, b) => a.price - b.price);
+        }
+        break;
+      case 3: //3 'Sort by stock &uarr;', - от наибольшего к наименьшему.
+        {
+          currentBase.products = currentBase.products.sort((a, b) => b.stock - a.stock);
+        }
+        break;
+      case 4: //4 'Sort by stock &darr;', - от наименьшего к наибольшему.
+        {
+          currentBase.products = currentBase.products.sort((a, b) => a.stock - b.stock);
+        }
+        break;
+    }
+  }
+
+  // поиск
+  private filterTextSearch(currentBase: IProducts): void {
+    currentBase.products = currentBase.products.filter((item) => {
+      return [
+        JSON.stringify(item.title).toLowerCase().includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.description).toLowerCase().includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.category).toLowerCase().includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.manufacturer).toLowerCase().includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.gender).toLowerCase().includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.price).toLowerCase().includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.discountPercentage)
+          .toLowerCase()
+          .includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.rating).toLowerCase().includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.stock).toLowerCase().includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.color).toLowerCase().includes(this.textSearch.toLowerCase()),
+      ].some((element) => element);
+    });
+  }
+
   // получение отфильтрованного списка товаров
   getGoods(): IProducts {
     // copy all goods.
     const tempBase: IProducts = {
       products: this.prodBase.products.map((item) => item),
     };
-
-    // apply sorting.
-
-    // aply text search.
 
     // apply checkbox filter.
     if (this.filter.length) {
@@ -286,6 +370,12 @@ class Model {
 
     // apply slider filter.
     this.applyFilterSliders(tempBase);
+
+    // apply sorting.
+    this.sortGoods(tempBase);
+
+    // aply text search.
+    this.filterTextSearch(tempBase);
 
     return tempBase;
   }
