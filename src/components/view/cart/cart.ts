@@ -91,7 +91,10 @@ class ViewCart {
     promocods: Array<IPromo>,
     apliedPromocods: Array<IPromo> = []
   ) {
-    const summary = createElement('div', 'summary', this.wrapper);
+    let summary = document.querySelector('.summary') as HTMLElement;
+    if (summary) removeChild(summary);
+    else summary = createElement('div', 'summary', this.wrapper);
+
     const summaryHeader = createElement('div', 'summary__header', summary);
     const summaryTitle = createElement('div', 'summary__header', summaryHeader);
     summaryTitle.textContent = 'Summary';
@@ -117,10 +120,20 @@ class ViewCart {
         promoText.textContent = `${item.title} - ${item.discount}%`;
         const promoBtn = createElement('button', 'promo__btn', promoItem);
         promoBtn.textContent = 'drop';
+        promoBtn.addEventListener('click', () => {
+          this.renderSummary(
+            items,
+            promocods,
+            apliedPromocods.filter((code) => code.code !== item.code)
+          );
+        });
       });
     }
 
     const inputCode = createElement('input', 'summary__input', summaryTotal, ['type', 'text']);
+    inputCode.addEventListener('input', (e) => {
+      // console.log(e.target.value);
+    });
 
     const summatyText = createElement('div', 'summary__text', summaryTotal);
     summatyText.textContent = `Promo for test: 'RS', 'YEAH'`;
