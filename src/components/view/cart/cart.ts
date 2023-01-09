@@ -31,7 +31,7 @@ class ViewCart {
   showModal() {
     const isValidName = this.isValidGenerate(
       '.app-modal__item-name',
-      /^[a-zA-Zа-яА-Я]{3,24}\s[a-zA-Zа-яА-Я]{3,24}$/,
+      /^([a-zA-Zа-яА-Я]{3,24}\s){1,3}[a-zA-Zа-яА-Я]{3,24}$/,
       'error'
     );
     const isValidPhone = this.isValidGenerate('.app-modal__item-phone', /^\+[0-9]{9,15}$/, 'error');
