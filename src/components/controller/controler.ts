@@ -125,7 +125,7 @@ class Controller {
       }
 
       if (page === 'cart') {
-        this.viewCart.render(validParams);
+        this.viewCart.render(validParams, this.model);
       }
 
       if (page === 'goods') {
