@@ -322,7 +322,7 @@ class ViewMain {
 
     cartButton.addEventListener('click', () => {
       model.addCart(item.id);
-      model.logCart();
+      model.saveLocalStorage();
       model.updateHash();
     });
   }
