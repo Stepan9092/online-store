@@ -51,3 +51,9 @@ export interface IPromo {
   discount: string;
   title: string;
 }
+
+export interface ICartBase {
+  id: number;
+  count: number;
+}
+
