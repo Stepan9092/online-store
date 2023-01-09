@@ -38,7 +38,7 @@ class Model {
   }
 
   getCartCount(): string {
-    return String(this.cart.length);
+    return String(this.cart.map((item) => item.count).reduce((acc, item) => (acc = acc + item), 0));
   }
 
   getCartTotal(): string {
@@ -46,7 +46,7 @@ class Model {
       this.cart
         .map((item) => {
           if (this.getGoodsByID(item.id).products[0]) {
-            return this.getGoodsByID(item.id).products[0].price;
+            return this.getGoodsByID(item.id).products[0].price * item.count;
           } else {
             return 0;
           }
@@ -95,6 +95,9 @@ class Model {
         count: 1,
       });
     }
+
+    this.header.changeSumHeader(this.getCartTotal());
+    this.header.changeBasketAmount(this.getCartCount());
   }
 
   removeOneItemCart(id: number): void {
@@ -107,6 +110,9 @@ class Model {
         }
       }
     });
+
+    this.header.changeSumHeader(this.getCartTotal());
+    this.header.changeBasketAmount(this.getCartCount());
   }
 
   // removeCart(id: number): void {
