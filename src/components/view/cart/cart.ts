@@ -251,6 +251,18 @@ class ViewCart {
       return;
     }
 
+    if (itemsPage.length === 0) {
+      this.renderCart(
+        items,
+        [
+          { parametr: 'limit', value: `${limit}` },
+          { parametr: 'page', value: `${page - 1}` },
+        ],
+        model
+      );
+      return;
+    }
+
     const cartBlock = createElement('div', 'cart', this.wrapper);
     const cartHeader = createElement('div', 'cart__header', cartBlock);
 
