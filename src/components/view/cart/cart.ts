@@ -247,6 +247,7 @@ class ViewCart {
     if (items.length === 0) {
       const title = createElement('h2', 'cart-empty__title', this.wrapper);
       title.textContent = 'Cart is empty';
+      this.renderSummary(items);
       return;
     }
 
@@ -308,12 +309,16 @@ class ViewCart {
 
   renderSummary(
     items: Array<ICartProduct>,
-    promocods: Array<IPromo>,
+    promocods: Array<IPromo> = [],
     apliedPromocods: Array<IPromo> = []
   ) {
     let summary = document.querySelector('.summary') as HTMLElement;
     if (summary) removeChild(summary);
     else summary = createElement('div', 'summary', this.wrapper);
+
+    if (items.length === 0) {
+      summary.remove();
+    }
 
     const summaryHeader = createElement('div', 'summary__header', summary);
     const summaryTitle = createElement('div', 'summary__header', summaryHeader);
@@ -428,9 +433,8 @@ class ViewCart {
     const minusCount = createElement('button', 'cart-item__numberMinus', numberControl);
     minusCount.textContent = '-';
     minusCount.addEventListener('click', () => {
-      /*
-        удаление элемента из localStorage
-      */
+      model.removeOneItemCart(item.id);
+      model.saveLocalStorage();
       this.render(parametr, model);
     });
     const count = createElement('span', 'cart-item__count', numberControl);
@@ -438,11 +442,11 @@ class ViewCart {
     const plusCount = createElement('button', 'cart-item__numberPlus', numberControl);
     plusCount.textContent = '+';
     plusCount.addEventListener('click', () => {
-      if (item.count + 1 <= item.stock)
-        /*
-        добавление элемента в localStorage
-        */
-        this.render(parametr, model);
+      if (item.count + 1 <= item.stock) {
+        model.addOneItemCart(item.id);
+        model.saveLocalStorage();
+      }
+      this.render(parametr, model);
     });
     const price = createElement('div', 'cart-item__price', countControl);
     price.textContent = `${((item.price * (100 - item.discountPercentage)) / 100).toFixed(2)}$`;
@@ -475,7 +479,12 @@ class ViewCart {
     //   { id: '31', count: '2' },
     // ];
 
-    const data1: Array<ICartBase> = model.getCart();
+    let data1: Array<ICartBase> = model.getCart();
+
+    data1 = data1.sort((a, b) => {
+      if (a.id < b.id) return -1;
+      return 0;
+    });
 
     const items: Array<ICartProduct> = model
       .getGoodsByIPs(data1.map((el) => el.id + ''))

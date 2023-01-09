@@ -85,6 +85,30 @@ class Model {
     this.header.changeBasketAmount(this.getCartCount());
   }
 
+  addOneItemCart(id: number): void {
+    const product = this.cart.find((el) => el.id == id);
+    if (product) {
+      product.count += 1;
+    } else {
+      this.cart.push({
+        id: id,
+        count: 1,
+      });
+    }
+  }
+
+  removeOneItemCart(id: number): void {
+    this.cart.forEach((item, index) => {
+      if (item.id === id) {
+        if (item.count === 1) {
+          this.cart.splice(index, 1);
+        } else {
+          item.count -= 1;
+        }
+      }
+    });
+  }
+
   // removeCart(id: number): void {
   //   if (this.cart.some((item) => item.id === id)) {
   //     this.cart.forEach((item) => {
