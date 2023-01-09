@@ -1,6 +1,11 @@
 import Model from '../../model/model';
 import { createElement, removeChild } from '../../helper/index';
 import { ICartProduct, IParametr, IProduct, IPromo } from '../../types/index';
+import cardPicture from '../../../assets/card-template.jpg';
+import masterCard from '../../../assets/mastercard.jpg';
+import visa from '../../../assets/visa.webp';
+import mir from '../../../assets/mir.png';
+import americanExpress from '../../../assets/americanExpress.webp';
 
 class ViewCart {
   private wrapper: HTMLElement | null = null;
@@ -8,6 +13,222 @@ class ViewCart {
 
   constructor() {
     this.main = document.querySelector('main');
+  }
+
+  isValidGenerate(className: string, reg: RegExp, errorMessage: string) {
+    return (value: string) => {
+      const parent = document.querySelector(className) as HTMLElement;
+      let errorBlock = parent.querySelector('.app-modal__error') as HTMLElement;
+      if (!errorBlock) {
+        errorBlock = createElement('div', 'app-modal__error', parent);
+      }
+      if (!reg.test(value)) errorBlock.textContent = errorMessage;
+      else parent.removeChild(errorBlock);
+      return reg.test(value);
+    };
+  }
+
+  showModal() {
+    const isValidName = this.isValidGenerate(
+      '.app-modal__item-name',
+      /^[a-zA-Zа-яА-Я]{3,24}\s[a-zA-Zа-яА-Я]{3,24}$/,
+      'error'
+    );
+    const isValidPhone = this.isValidGenerate('.app-modal__item-phone', /^\+[0-9]{9,15}$/, 'error');
+    const isValidAddress = this.isValidGenerate(
+      '.app-modal__item-address',
+      /^[\S]{5,24} *[\S]{5,24} *[\S]{5,24}$/,
+      'error'
+    );
+    const isValidEmail = this.isValidGenerate(
+      '.app-modal__item-email',
+      /^[A-Z0-9._%+-]+@[A-Z0-9-]+.+.[A-Z]{2,4}$/i,
+      'error'
+    );
+    const isValidCardNumber = this.isValidGenerate(
+      '.card-errors__number',
+      /^[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}$/,
+      'Card number - error'
+    );
+    const isValidThru = this.isValidGenerate(
+      '.card-errors__thru',
+      /^([0]{1}[0-9]|[1]{1}[0-2]{1}){1}\/[0-9]{2}$/,
+      'Card valid thru - error'
+    );
+    const isValidCVV = this.isValidGenerate('.card-errors__cvv', /^[0-9]{3}$/, 'Card CVV - error');
+    const modal = createElement('div', 'app-modal', document.body);
+    const modalBlock = createElement('div', 'app-modal__container', modal);
+    modal.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (e.target === modal) modal.remove();
+    });
+    const modalTitle = createElement('h2', 'app-modal__title', modalBlock);
+    modalTitle.textContent = 'Personal details';
+    const modalForm = createElement('form', 'app-modal__form', modalBlock);
+
+    const modalName = createElement('div', 'app-modal__item app-modal__item-name', modalForm);
+    const nameInput = createElement('input', 'app-modal__input', modalName, [
+      'placeholder',
+      'name',
+    ]) as HTMLInputElement;
+    nameInput.addEventListener('blur', (e) => {
+      const value = (e.target as HTMLInputElement).value;
+      isValidName(value);
+    });
+
+    const modalPhone = createElement('div', 'app-modal__item app-modal__item-phone', modalForm);
+    const phoneInput = createElement('input', 'app-modal__input', modalPhone, [
+      'placeholder',
+      'phone',
+    ]) as HTMLInputElement;
+    phoneInput.addEventListener('blur', (e) => {
+      const value = (e.target as HTMLInputElement).value;
+      isValidPhone(value);
+    });
+
+    const modalAddress = createElement('div', 'app-modal__item app-modal__item-address', modalForm);
+    const addressInput = createElement('input', 'app-modal__input', modalAddress, [
+      'placeholder',
+      'address',
+    ]) as HTMLInputElement;
+    addressInput.addEventListener('blur', (e) => {
+      const value = (e.target as HTMLInputElement).value;
+      isValidAddress(value);
+    });
+    const modalEmail = createElement('div', 'app-modal__item app-modal__item-email', modalForm);
+    const emailInput = createElement('input', 'app-modal__input', modalEmail, [
+      'placeholder',
+      'email',
+    ]) as HTMLInputElement;
+    emailInput.addEventListener('blur', (e) => {
+      const value = (e.target as HTMLInputElement).value;
+      isValidEmail(value);
+    });
+
+    const cardTitle = createElement('h2', 'app-modal__title', modalForm);
+    cardTitle.textContent = 'Credit card details';
+    const card = createElement('div', 'card', modalForm);
+    const cardNumber = createElement('div', 'card__number', card);
+    const cardImage = createElement('img', 'card__image', cardNumber) as HTMLImageElement;
+    cardImage.src = cardPicture;
+    const cardNumberInput = createElement(
+      'input',
+      'app-modal__input app-modal__input-card',
+      cardNumber,
+      ['placeholder', 'Card Number'],
+      ['maxlength', '19']
+    ) as HTMLInputElement;
+    cardNumberInput.addEventListener('input', function (e) {
+      const event = e as InputEvent;
+      const enteredSymbol = event.data;
+      const indexsOfSpace = [4, 9, 14];
+      const firstLetter = this.value[0];
+      switch (firstLetter) {
+        case '2': {
+          cardImage.src = mir;
+          break;
+        }
+        case '3': {
+          cardImage.src = americanExpress;
+          break;
+        }
+        case '4': {
+          cardImage.src = visa;
+          break;
+        }
+        case '5': {
+          cardImage.src = masterCard;
+          break;
+        }
+        default: {
+          cardImage.src = cardPicture;
+        }
+      }
+      if (enteredSymbol != null)
+        if (indexsOfSpace.includes(this.value.length)) {
+          this.value += ' ';
+        }
+      this.value = `${this.value.replace(/[^\d ]/g, '')}`;
+    });
+    cardNumberInput.addEventListener('blur', function () {
+      isValidCardNumber(this.value);
+    });
+
+    const cardData = createElement('div', 'card__data', card);
+    const cardThru = createElement('div', 'card__thru', cardData);
+    const cardThruText = createElement('div', 'card__text', cardThru);
+    cardThruText.textContent = 'VALID:';
+    const cardThruInput = createElement(
+      'input',
+      'card__input',
+      cardThru,
+      ['placeholder', 'Valid Thru'],
+      ['maxlength', '5']
+    ) as HTMLInputElement;
+    cardThruInput.addEventListener('input', function (e) {
+      const event = e as InputEvent;
+      const enteredSymbol = event.data;
+      if (enteredSymbol != null) {
+        if (this.value.length == 2) this.value += '/';
+      }
+      this.value = `${this.value.replace(/[^\d/]/g, '')}`;
+    });
+    cardThruInput.addEventListener('blur', function () {
+      isValidThru(this.value);
+    });
+    const cardCVV = createElement('div', 'card__cvv', cardData);
+    const cardCVVText = createElement('div', 'card__text', cardCVV);
+    cardCVVText.textContent = 'CVV:';
+    const cardCVVInput = createElement(
+      'input',
+      'card__input',
+      cardCVV,
+      ['placeholder', 'Code'],
+      ['maxlength', '3']
+    ) as HTMLInputElement;
+    cardCVVInput.addEventListener('input', function () {
+      this.value = this.value.replace(/[^\d]/g, '');
+    });
+    cardCVVInput.addEventListener('blur', function () {
+      isValidCVV(this.value);
+    });
+    const errorsBlock = createElement('div', 'card-errors', modalForm);
+    createElement('div', 'card-errors__number card-errors__item', errorsBlock);
+    createElement('div', 'card-errors__thru card-errors__item', errorsBlock);
+    createElement('div', 'card-errors__cvv card-errors__item', errorsBlock);
+    const cardSubmit = createElement(
+      'input',
+      'app-modal__submit',
+      modalForm,
+      ['type', 'submit'],
+      ['value', 'CONFIRM']
+    );
+    cardSubmit.addEventListener('click', () => {
+      isValidName(nameInput.value);
+      isValidAddress(addressInput.value);
+      isValidPhone(phoneInput.value);
+      isValidEmail(emailInput.value);
+      isValidCVV(cardCVVInput.value);
+      isValidCardNumber(cardNumberInput.value);
+      isValidThru(cardThruInput.value);
+      if (
+        isValidName(nameInput.value) &&
+        isValidAddress(addressInput.value) &&
+        isValidPhone(phoneInput.value) &&
+        isValidEmail(emailInput.value) &&
+        isValidCVV(cardCVVInput.value) &&
+        isValidCardNumber(cardNumberInput.value) &&
+        isValidThru(cardThruInput.value)
+      ) {
+        removeChild(modalBlock);
+        modalBlock.classList.add('modal-redirect');
+        modalBlock.textContent = 'Thanks for your order. Redirect to the store after 3 sec';
+        setTimeout(() => {
+          document.body.removeChild(modal);
+          window.location.hash = '#/main';
+        }, 3000);
+      }
+    });
   }
 
   renderCart(items: Array<ICartProduct>, parametr: Array<IParametr>, model: Model) {
@@ -162,6 +383,9 @@ class ViewCart {
     summatyText.textContent = `Promo for test: 'RS', 'YEAH'`;
     const buyBtn = createElement('button', 'summary__btn', summaryTotal);
     buyBtn.textContent = 'BUY NOW';
+    buyBtn.addEventListener('click', () => {
+      this.showModal();
+    });
   }
 
   renderProduct(
