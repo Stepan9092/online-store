@@ -132,7 +132,20 @@ class Controller {
       }
 
       if (page === 'goods') {
-        this.viewCart.render(validParams);
+        // if (validParams[0].parametr === 'id') {
+        //   this.viewGods.render(Number(validParams[0].value));
+        // } else {
+        //   this.error.render();
+        // }
+        if (validParams.length > 0 && validParams.some((item) => item.parametr === 'id')) {
+          validParams.forEach((item) => {
+            if (item.parametr === 'id') {
+              this.viewGods.render(Number(item.value));
+            }
+          });
+        } else {
+          this.error.render();
+        }
       }
     } else {
       // render 404

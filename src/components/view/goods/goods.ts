@@ -1,5 +1,4 @@
 import { createElement, removeChild } from '../../helper/index';
-import { IParametr } from '../../types/index';
 
 class ViewGoods {
   private wrapper: HTMLElement | null = null;
@@ -9,12 +8,12 @@ class ViewGoods {
     this.main = document.querySelector('main');
   }
 
-  testText(parrent: HTMLElement, text: string): void {
-    createElement('h1', '', this.wrapper).textContent = 'GOODS';
-    createElement('h2', '', this.wrapper).textContent = text;
+  testText(parrent: HTMLElement, id: number): void {
+    createElement('h1', '', parrent).textContent = 'GOODS';
+    createElement('h2', '', parrent).textContent = `GOODS ID ${String(id)}`;
   }
 
-  render(parametr: Array<IParametr>): void {
+  render(id: number): void {
     const wrapper: HTMLElement | null = document.querySelector('.goods-wrapper');
 
     // Если .cart-wrapper нету -> значит страница загружается первый раз, добавляем .cart-wrapper
@@ -30,7 +29,7 @@ class ViewGoods {
       removeChild(this.wrapper);
     }
 
-    this.testText(this.wrapper, JSON.stringify(parametr));
+    this.testText(this.wrapper, id);
   }
 }
 
