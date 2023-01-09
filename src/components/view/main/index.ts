@@ -269,6 +269,22 @@ class ViewMain {
     if (input !== null) {
       input.value = model.getCurrentSearch();
     }
+
+    const mainProd: HTMLElement | null = document.querySelector('.main__products');
+    const goodsViewBtn: HTMLElement | null = document.querySelector('.goods__view');
+    if (goodsViewBtn !== null) {
+      if (model.getCurrentView()) {
+        goodsViewBtn.textContent = 'SMALL VIEW';
+        if (mainProd !== null) {
+          mainProd.classList.remove('small');
+        }
+      } else {
+        goodsViewBtn.textContent = 'BIG VIEW';
+        if (mainProd !== null) {
+          mainProd.classList.add('small');
+        }
+      }
+    }
   }
 
   // отрисовка единицы товара
@@ -378,6 +394,27 @@ class ViewMain {
 
     input.addEventListener('input', () => {
       model.changeSearch(input.value);
+      model.updateHash();
+    });
+
+    //main__products
+    const goodsViewBtn = createElement('div', 'goods__view', controlWrapper);
+    const mainProd: HTMLElement | null = document.querySelector('.main__products');
+
+    if (model.getCurrentView()) {
+      goodsViewBtn.textContent = 'SMALL VIEW';
+      if (mainProd !== null) {
+        mainProd.classList.remove('small');
+      }
+    } else {
+      goodsViewBtn.textContent = 'BIG VIEW';
+      if (mainProd !== null) {
+        mainProd.classList.add('small');
+      }
+    }
+
+    goodsViewBtn.addEventListener('click', () => {
+      model.changeView();
       model.updateHash();
     });
   }

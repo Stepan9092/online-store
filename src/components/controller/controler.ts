@@ -30,7 +30,7 @@ class Controller {
     this.validPage = new Array<IPage>();
     this.validPage.push({
       page: 'main',
-      params: ['category', 'manufacturer', 'gender', 'price', 'stock', 'sort', 'search'],
+      params: ['category', 'manufacturer', 'gender', 'price', 'stock', 'sort', 'search', 'view'],
     });
     this.validPage.push({
       page: 'goods',
@@ -119,6 +119,15 @@ class Controller {
           })
           .forEach((item) => {
             this.model.changeSearch(item.value);
+          });
+
+        // установить вид
+        validParams
+          .filter((filterItem) => {
+            return ['view'].some((someItem) => someItem === filterItem.parametr);
+          })
+          .forEach(() => {
+            this.model.changeView();
           });
 
         this.model.updateHash();

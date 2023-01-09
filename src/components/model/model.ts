@@ -20,6 +20,7 @@ class Model {
   };
   private sortType = 0;
   private textSearch = '';
+  private viewBig = true;
 
   private cart: Array<ICartBase>;
 
@@ -161,6 +162,7 @@ class Model {
 
     this.sortType = 0;
     this.textSearch = '';
+    this.viewBig = true;
   }
 
   // получить массив строк - фильтров
@@ -234,6 +236,14 @@ class Model {
       }
     }
 
+    // apply view
+    if (this.viewBig === false) {
+      const addHash = `view=false`;
+      if (hash.indexOf(addHash) === -1) {
+        hash = hash.indexOf('?') === -1 ? `${hash}?${addHash}` : `${hash}&${addHash}`;
+      }
+    }
+
     if (window.location.hash.replace('%20', ' ') !== hash) {
       window.location.hash = hash;
     }
@@ -273,6 +283,14 @@ class Model {
       this.filterStock.filterValueMax = filterValueMax;
       this.filterStock.filterValueMin = filterValueMin;
     }
+  }
+
+  changeView(): void {
+    this.viewBig = !this.viewBig;
+  }
+
+  getCurrentView(): boolean {
+    return this.viewBig;
   }
 
   // меняет тип сортировки
