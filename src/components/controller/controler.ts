@@ -75,7 +75,6 @@ class Controller {
     if (this.isPageValid(page)) {
       const validParams = this.getValidParams(page, params);
 
-      // console.log(page);
       // render main page
       if (page === 'main') {
         this.view.render(this.model);
@@ -89,7 +88,6 @@ class Controller {
           })
           .forEach((item) => {
             this.model.changeFilter(item.parametr, item.value, true);
-            // console.log(item.parametr, item.value);
           });
 
         // добавить slider фильтры 'stock', 'price'
@@ -123,7 +121,6 @@ class Controller {
             this.model.changeSearch(item.value);
           });
 
-        // console.log('test!');
         this.model.updateHash();
       }
 
@@ -132,7 +129,18 @@ class Controller {
       }
 
       if (page === 'goods') {
-        this.viewCart.render(validParams);
+        if (validParams.length > 0 && validParams.some((item) => item.parametr === 'id')) {
+          validParams.forEach((item) => {
+            if (item.parametr === 'id') {
+              const products = this.model.getGoodsByID(Number(item.value));
+              if (products.products.length === 1) {
+                this.viewGods.render(products.products[0], this.model);
+              }
+            }
+          });
+        } else {
+          this.error.render();
+        }
       }
     } else {
       // render 404

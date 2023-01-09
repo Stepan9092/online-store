@@ -3,6 +3,8 @@ import { createElement, removeChild } from '../../helper/index';
 import { IProduct, IProducts } from '../../types/index';
 import starFill from '../../../assets/star_fill.png';
 import star from '../../../assets/star.png';
+import cart1 from '../../../assets/cart1.png';
+import cart2 from '../../../assets/cart2.png';
 
 class ViewMain {
   private main: HTMLElement | null;
@@ -270,7 +272,7 @@ class ViewMain {
   }
 
   // отрисовка единицы товара
-  private renderGodsCard(parrent: HTMLElement | null, item: IProduct): void {
+  private renderGodsCard(parrent: HTMLElement | null, item: IProduct, model: Model): void {
     const prodItem = createElement('div', 'product__item', parrent);
     const itemImage = createElement('div', 'item__image', prodItem);
     itemImage.style.backgroundImage = `url(${item.thumbnail})`;
@@ -312,9 +314,16 @@ class ViewMain {
     }
     const infoBlockRight = createElement('div', 'info__block-right', infoBlock);
     const cartButton = createElement('div', 'add-to-cart_control', infoBlockRight);
+    if (model.isIDInCart(item.id)) {
+      cartButton.style.backgroundImage = `url(${cart2})`;
+    } else {
+      cartButton.style.backgroundImage = `url(${cart1})`;
+    }
 
     cartButton.addEventListener('click', () => {
-      console.log('add to cart => ', item.id);
+      model.addCart(item.id);
+      model.saveLocalStorage();
+      model.updateHash();
     });
   }
 
@@ -388,7 +397,7 @@ class ViewMain {
         }
 
         items.products.forEach((item: IProduct) => {
-          this.renderGodsCard(prodBlock, item);
+          this.renderGodsCard(prodBlock, item, model);
         });
       } else {
         createElement('div', 'goods__not-found', goodsBlock).innerHTML =

@@ -41,3 +41,8 @@ export interface IParametr {
   parametr: string;
   value: string;
 }
+
+export interface ICartBase {
+  id: number;
+  count: number;
+}
