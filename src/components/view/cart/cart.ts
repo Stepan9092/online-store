@@ -1,6 +1,6 @@
 import Model from '../../model/model';
 import { createElement, removeChild } from '../../helper/index';
-import { ICartProduct, IParametr, IProduct, IPromo } from '../../types/index';
+import { ICartProduct, IParametr, IProduct, IPromo, ICartBase } from '../../types/index';
 import cardPicture from '../../../assets/card-template.jpg';
 import masterCard from '../../../assets/mastercard.jpg';
 import visa from '../../../assets/visa.webp';
@@ -465,20 +465,22 @@ class ViewCart {
     }
 
     // пример данных с localStorage
-    const data = [
-      { id: '1', count: '4' },
-      { id: '2', count: '4' },
-      { id: '3', count: '4' },
-      { id: '4', count: '4' },
-      { id: '14', count: '2' },
-      { id: '11', count: '4' },
-      { id: '31', count: '2' },
-    ];
+    // const data = [
+    //   { id: '1', count: '4' },
+    //   { id: '2', count: '4' },
+    //   { id: '3', count: '4' },
+    //   { id: '4', count: '4' },
+    //   { id: '14', count: '2' },
+    //   { id: '11', count: '4' },
+    //   { id: '31', count: '2' },
+    // ];
+
+    const data1: Array<ICartBase> = model.getCart();
 
     const items: Array<ICartProduct> = model
-      .getGoodsByIPs(data.map((el) => el.id))
+      .getGoodsByIPs(data1.map((el) => el.id + ''))
       .products.map((el, index) => {
-        return { ...el, count: Number(data[index].count) };
+        return { ...el, count: Number(data1[index].count) };
       });
 
     const promocods: Array<IPromo> = [

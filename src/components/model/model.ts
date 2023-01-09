@@ -29,6 +29,11 @@ class Model {
   }
 
   //! Методы для работы с корзиной!
+
+  getCart() {
+    return this.cart;
+  }
+
   loadLocalStoreage(): void {
     const tempLocalStorage = localStorage.getItem('cart');
     if (tempLocalStorage !== null) {
