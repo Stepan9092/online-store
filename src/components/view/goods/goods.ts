@@ -1,3 +1,4 @@
+import Model from '../../model/model';
 import { createElement, removeChild } from '../../helper/index';
 import { IProduct } from '../../types/index';
 
@@ -9,9 +10,9 @@ class ViewGoods {
     this.main = document.querySelector('main');
   }
 
-  testText(parrent: HTMLElement, item: IProduct): void {
+  testText(parrent: HTMLElement, item: IProduct, model: Model): void {
     // image
-    console.log(item);
+    // console.log(item);
     const nav = createElement('div', 'goods__navigation', parrent);
     nav.textContent = `${item.gender} / ${item.category} / ${item.manufacturer} / ${item.title}`;
     const goods = createElement('div', 'goods', parrent);
@@ -60,11 +61,20 @@ class ViewGoods {
     // cart
     const cart = createElement('div', 'goods__cart', discription);
     createElement('div', 'goods__cart-price', cart).textContent = `${item.price} $`;
-    createElement('div', 'goods__cart__add-btn', cart).textContent = 'ADD TO CART';
+    const addToCart = createElement('div', 'goods__cart__add-btn', cart);
+    if (model.isIDInCart(item.id)) {
+      addToCart.textContent = 'DROP FROM CART';
+    } else {
+      addToCart.textContent = 'ADD TO CART';
+    }
+
+    addToCart.addEventListener('click', () => {
+      model.addCart(item.id);
+    });
     createElement('div', 'goods__cart__buy-btn', cart).textContent = 'BUY NOW';
   }
 
-  render(item: IProduct): void {
+  render(item: IProduct, model: Model): void {
     const wrapper: HTMLElement | null = document.querySelector('.goods-wrapper');
 
     // Если .cart-wrapper нету -> значит страница загружается первый раз, добавляем .cart-wrapper
@@ -80,7 +90,7 @@ class ViewGoods {
       removeChild(this.wrapper);
     }
 
-    this.testText(this.wrapper, item);
+    this.testText(this.wrapper, item, model);
   }
 }
 

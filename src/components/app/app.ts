@@ -35,10 +35,14 @@ class App {
   }
 
   run(): void {
+    this.model.run();
     this.header.run();
     this.footer.run();
     this.controller.run();
-    this.model.run();
+
+    window.addEventListener('unload', () => {
+      this.model.saveLocalStorage();
+    });
   }
 }
 

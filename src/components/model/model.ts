@@ -1,6 +1,6 @@
 import base from '../model/products.json';
 import ViewMain from '../view/main/index';
-import { IProduct, IProducts, IFilterItems, IFilterItemSlider } from '../types/index';
+import { IProduct, IProducts, IFilterItems, IFilterItemSlider, ICartBase } from '../types/index';
 
 class Model {
   private view: ViewMain;
@@ -19,11 +19,66 @@ class Model {
   private sortType = 0;
   private textSearch = '';
 
+  private cart: Array<ICartBase>;
+
   constructor(view: ViewMain) {
     this.view = view;
     this.prodBase = base;
     this.filter = new Array<IFilterItems>();
+    this.cart = [];
   }
+
+  //! Методы для работы с корзиной!
+  loadLocalStoreage(): void {
+    const tempLocalStorage = localStorage.getItem('cart');
+    if (tempLocalStorage !== null) {
+      this.cart = JSON.parse(tempLocalStorage);
+    }
+  }
+
+  saveLocalStorage(): void {
+    localStorage.setItem('cart', JSON.stringify(this.cart));
+  }
+
+  addCart(id: number): void {
+    if (this.cart.some((item) => item.id === id)) {
+      this.cart.forEach((item, index) => {
+        if (item.id === id) {
+          this.cart.splice(index, 1);
+        }
+      });
+    } else {
+      this.cart.push({
+        id: id,
+        count: 1,
+      });
+    }
+  }
+
+  // removeCart(id: number): void {
+  //   if (this.cart.some((item) => item.id === id)) {
+  //     this.cart.forEach((item) => {
+  //       if (item.id === id) {
+  //         item.count = item.count + 1;
+  //       }
+  //     });
+  //   } else {
+  //     this.cart.push({
+  //       id: id,
+  //       count: 1,
+  //     });
+  //   }
+  // }
+
+  isIDInCart(id: number): boolean {
+    return this.cart.some((item) => item.id === id);
+  }
+
+  logCart(): void {
+    console.log(this.cart);
+  }
+
+  //! ///////////////////////////////////////////
 
   getGoodsByID(id: number): IProducts {
     const tempBase: IProducts = {
@@ -389,6 +444,7 @@ class Model {
 
   run(): void {
     // this.view.render(this);
+    this.loadLocalStoreage();
   }
 }
 
