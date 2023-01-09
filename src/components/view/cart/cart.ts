@@ -423,6 +423,9 @@ class ViewCart {
       'cart-item__image',
       productInfoBlock
     ) as HTMLImageElement;
+    productImg.addEventListener('click', () => {
+      window.location.hash = `#/goods?id=${item.id}`;
+    });
     productImg.src = item.thumbnail;
     const productInfo = createElement('div', 'cart-item__container', productInfoBlock);
     const productName = createElement('div', 'cart-item__name', productInfo);
