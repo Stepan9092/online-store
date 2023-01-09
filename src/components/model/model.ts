@@ -25,6 +25,13 @@ class Model {
     this.filter = new Array<IFilterItems>();
   }
 
+  getGoodsByID(id: number): IProducts {
+    const tempBase: IProducts = {
+      products: this.prodBase.products.filter((item) => item.id === id),
+    };
+    return tempBase;
+  }
+
   // сброс всех фильтров
   resetFiler(): void {
     while (this.filter.length) {

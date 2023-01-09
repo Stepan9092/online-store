@@ -140,7 +140,10 @@ class Controller {
         if (validParams.length > 0 && validParams.some((item) => item.parametr === 'id')) {
           validParams.forEach((item) => {
             if (item.parametr === 'id') {
-              this.viewGods.render(Number(item.value));
+              const products = this.model.getGoodsByID(Number(item.value));
+              if (products.products.length === 1) {
+                this.viewGods.render(products.products[0]);
+              }
             }
           });
         } else {

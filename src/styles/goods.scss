@@ -1,0 +1,53 @@
+.goods-wrapper {
+  font-family: 'Amazon Ember';
+  min-height: calc(100vh - 160px);
+  display: flex;
+  gap: 15px;
+  margin: 20px auto;
+  padding: 0 20px;
+  max-width: 1500px;
+
+  display: flex;
+  flex-direction: column;
+
+  .goods__navigation {
+    width: 80%;
+    //height: 100%;
+    margin: 0 auto;
+
+    font-size: 14px;
+    color: #8b8b8b;
+    cursor: default;
+    user-select: none;
+  }
+
+  .goods {
+    width: 80%;
+    height: 100%;
+    margin: 0 auto;
+
+    .goods__header {
+      padding: 0 20px;
+      background-color: #f5f5f5;
+      // #c5c5c5
+      display: flex;
+      align-items: center;
+      height: 50px;
+      justify-content: space-between;
+    }
+
+    .goods__discription {
+
+    }
+  }
+}
+
+
+.goods__photo-main_image{
+  width: 100px;
+  //height: 100px;
+}
+
+.goods__photo-preview_image {
+  width: 100px;
+}
