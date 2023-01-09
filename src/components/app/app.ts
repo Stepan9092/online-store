@@ -24,7 +24,7 @@ class App {
     this.viewCart = new ViewCart();
     this.viewError = new ViewError();
     this.ViewGoods = new ViewGoods();
-    this.model = new Model(this.view);
+    this.model = new Model(this.view, this.header);
     this.controller = new Controller(
       this.view,
       this.model,
@@ -36,7 +36,7 @@ class App {
 
   run(): void {
     this.model.run();
-    this.header.run();
+    this.header.run(this.model.getCartTotal(), this.model.getCartCount());
     this.footer.run();
     this.controller.run();
 

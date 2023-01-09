@@ -138,9 +138,10 @@ class Controller {
               }
             }
           });
-        } else {
-          this.error.render();
         }
+        // } else {
+        //   this.error.render();
+        // }
       }
     } else {
       // render 404
