@@ -1,0 +1,15 @@
+.error-wrapper {
+  font-family: 'Amazon Ember';
+  min-height: calc(100vh - 160px);
+  display: flex;
+  gap: 15px;
+  margin: 20px auto;
+  padding: 0 20px;
+  max-width: 1500px;
+
+    .error-message {
+      margin: 20vh auto 0 auto;
+      font-size: 36px;
+      font-weight: 600;
+    }
+}
