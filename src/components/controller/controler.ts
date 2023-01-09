@@ -1,28 +1,40 @@
 import Model from '../model/model';
 import ViewMain from '../view/main/index';
 import ViewCart from '../view/cart/cart';
+import ViewError from '../view/error/404';
+import ViewGods from '../view/goods/goods';
 import { IPage, IParametr } from '../types/index';
 
 class Controller {
   private view: ViewMain;
   private viewCart: ViewCart;
+  private viewGods: ViewGods;
+  private error: ViewError;
   private model: Model;
   private validPage: Array<IPage>;
 
-  constructor(view: ViewMain, model: Model, viewCart: ViewCart) {
+  constructor(
+    view: ViewMain,
+    model: Model,
+    viewCart: ViewCart,
+    error: ViewError,
+    viewGoods: ViewGods
+  ) {
     this.model = model;
     this.view = view;
     this.viewCart = viewCart;
+    this.viewGods = viewGoods;
+    this.error = error;
 
     // описание валидных страниц и их параметров.
     this.validPage = new Array<IPage>();
     this.validPage.push({
       page: 'main',
-      params: ['category', 'manufacturer', 'gender', 'price', 'stock'],
+      params: ['category', 'manufacturer', 'gender', 'price', 'stock', 'sort', 'search', 'view'],
     });
     this.validPage.push({
       page: 'goods',
-      params: [],
+      params: ['id'],
     });
     this.validPage.push({
       page: 'cart',
@@ -63,7 +75,6 @@ class Controller {
     if (this.isPageValid(page)) {
       const validParams = this.getValidParams(page, params);
 
-      // console.log(page);
       // render main page
       if (page === 'main') {
         this.view.render(this.model);
@@ -77,7 +88,6 @@ class Controller {
           })
           .forEach((item) => {
             this.model.changeFilter(item.parametr, item.value, true);
-            // console.log(item.parametr, item.value);
           });
 
         // добавить slider фильтры 'stock', 'price'
@@ -93,16 +103,59 @@ class Controller {
             );
           });
 
-        // console.log('test!');
+        // установить тип сортировки
+        validParams
+          .filter((filterItem) => {
+            return ['sort'].some((someItem) => someItem === filterItem.parametr);
+          })
+          .forEach((item) => {
+            this.model.changeSort(Number(item.value));
+          });
+
+        // установить текстовый поиск
+        validParams
+          .filter((filterItem) => {
+            return ['search'].some((someItem) => someItem === filterItem.parametr);
+          })
+          .forEach((item) => {
+            this.model.changeSearch(item.value);
+          });
+
+        // установить вид
+        validParams
+          .filter((filterItem) => {
+            return ['view'].some((someItem) => someItem === filterItem.parametr);
+          })
+          .forEach(() => {
+            this.model.changeView();
+          });
+
         this.model.updateHash();
       }
 
       if (page === 'cart') {
-        this.viewCart.render(validParams);
+        this.viewCart.render(validParams, this.model);
+      }
+
+      if (page === 'goods') {
+        if (validParams.length > 0 && validParams.some((item) => item.parametr === 'id')) {
+          validParams.forEach((item) => {
+            if (item.parametr === 'id') {
+              const products = this.model.getGoodsByID(Number(item.value));
+              if (products.products.length === 1) {
+                this.viewGods.render(products.products[0], this.model);
+              }
+            }
+          });
+        }
+        // } else {
+        //   this.error.render();
+        // }
       }
     } else {
       // render 404
       console.log('RENDER 404');
+      this.error.render();
     }
   }
 

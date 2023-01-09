@@ -15,6 +15,10 @@ export interface IProduct {
   images: Array<string>;
 }
 
+export interface ICartProduct extends IProduct{
+  count: number;
+}
+
 export interface IProducts {
   products: Array<IProduct>;
 }
@@ -41,3 +45,15 @@ export interface IParametr {
   parametr: string;
   value: string;
 }
+
+export interface IPromo {
+  code: string;
+  discount: string;
+  title: string;
+}
+
+export interface ICartBase {
+  id: number;
+  count: number;
+}
+

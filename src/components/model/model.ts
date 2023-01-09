@@ -1,8 +1,10 @@
 import base from '../model/products.json';
 import ViewMain from '../view/main/index';
-import { IProduct, IProducts, IFilterItems, IFilterItemSlider } from '../types/index';
+import Header from '../view/header/header';
+import { IProduct, IProducts, IFilterItems, IFilterItemSlider, ICartBase } from '../types/index';
 
 class Model {
+  private header: Header;
   private view: ViewMain;
   private prodBase: IProducts;
   private filter: Array<IFilterItems>;
@@ -16,11 +18,134 @@ class Model {
     filterValueMin: -1,
     filterValueMax: -1,
   };
+  private sortType = 0;
+  private textSearch = '';
+  private viewBig = true;
 
-  constructor(view: ViewMain) {
+  private cart: Array<ICartBase>;
+
+  constructor(view: ViewMain, header: Header) {
     this.view = view;
     this.prodBase = base;
     this.filter = new Array<IFilterItems>();
+    this.cart = [];
+    this.header = header;
+  }
+
+  //! Методы для работы с корзиной!
+
+  getCart() {
+    return this.cart;
+  }
+
+  getCartCount(): string {
+    return String(this.cart.map((item) => item.count).reduce((acc, item) => (acc = acc + item), 0));
+  }
+
+  getCartTotal(): string {
+    return String(
+      this.cart
+        .map((item) => {
+          if (this.getGoodsByID(item.id).products[0]) {
+            return this.getGoodsByID(item.id).products[0].price * item.count;
+          } else {
+            return 0;
+          }
+        })
+        .reduce((acc, item) => (acc = acc + item), 0)
+        .toFixed(2)
+    );
+  }
+
+  loadLocalStoreage(): void {
+    const tempLocalStorage = localStorage.getItem('cart');
+    if (tempLocalStorage !== null) {
+      this.cart = JSON.parse(tempLocalStorage);
+    }
+  }
+
+  saveLocalStorage(): void {
+    localStorage.setItem('cart', JSON.stringify(this.cart));
+  }
+
+  addCart(id: number): void {
+    if (this.cart.some((item) => item.id === id)) {
+      this.cart.forEach((item, index) => {
+        if (item.id === id) {
+          this.cart.splice(index, 1);
+        }
+      });
+    } else {
+      this.cart.push({
+        id: id,
+        count: 1,
+      });
+    }
+
+    this.header.changeSumHeader(this.getCartTotal());
+    this.header.changeBasketAmount(this.getCartCount());
+  }
+
+  addOneItemCart(id: number): void {
+    const product = this.cart.find((el) => el.id == id);
+    if (product) {
+      product.count += 1;
+    } else {
+      this.cart.push({
+        id: id,
+        count: 1,
+      });
+    }
+
+    this.header.changeSumHeader(this.getCartTotal());
+    this.header.changeBasketAmount(this.getCartCount());
+  }
+
+  removeOneItemCart(id: number): void {
+    this.cart.forEach((item, index) => {
+      if (item.id === id) {
+        if (item.count === 1) {
+          this.cart.splice(index, 1);
+        } else {
+          item.count -= 1;
+        }
+      }
+    });
+
+    this.header.changeSumHeader(this.getCartTotal());
+    this.header.changeBasketAmount(this.getCartCount());
+  }
+
+  // removeCart(id: number): void {
+  //   if (this.cart.some((item) => item.id === id)) {
+  //     this.cart.forEach((item) => {
+  //       if (item.id === id) {
+  //         item.count = item.count + 1;
+  //       }
+  //     });
+  //   } else {
+  //     this.cart.push({
+  //       id: id,
+  //       count: 1,
+  //     });
+  //   }
+  // }
+
+  isIDInCart(id: number): boolean {
+    return this.cart.some((item) => item.id === id);
+  }
+
+  logCart(): void {
+    console.log(this.cart);
+  }
+
+  //! ///////////////////////////////////////////
+
+  getGoodsByID(id: number): IProducts {
+    const tempBase: IProducts = {
+      products: this.prodBase.products.filter((item) => item.id === id),
+    };
+    return tempBase;
   }
 
   // сброс всех фильтров
@@ -34,6 +159,10 @@ class Model {
 
     this.filterStock.filterValueMin = -1;
     this.filterStock.filterValueMax = -1;
+
+    this.sortType = 0;
+    this.textSearch = '';
+    this.viewBig = true;
   }
 
   // получить массив строк - фильтров
@@ -91,6 +220,30 @@ class Model {
     });
     // console.log(window.location.hash, hash);
 
+    // apply sort type
+    if (this.sortType !== 0) {
+      const addHash = `sort=${this.sortType}`;
+      if (hash.indexOf(addHash) === -1) {
+        hash = hash.indexOf('?') === -1 ? `${hash}?${addHash}` : `${hash}&${addHash}`;
+      }
+    }
+
+    // apply search
+    if (this.textSearch !== '') {
+      const addHash = `search=${this.textSearch}`;
+      if (hash.indexOf(addHash) === -1) {
+        hash = hash.indexOf('?') === -1 ? `${hash}?${addHash}` : `${hash}&${addHash}`;
+      }
+    }
+
+    // apply view
+    if (this.viewBig === false) {
+      const addHash = `view=false`;
+      if (hash.indexOf(addHash) === -1) {
+        hash = hash.indexOf('?') === -1 ? `${hash}?${addHash}` : `${hash}&${addHash}`;
+      }
+    }
+
     if (window.location.hash.replace('%20', ' ') !== hash) {
       window.location.hash = hash;
     }
@@ -130,6 +283,33 @@ class Model {
       this.filterStock.filterValueMax = filterValueMax;
       this.filterStock.filterValueMin = filterValueMin;
     }
+  }
+
+  changeView(): void {
+    this.viewBig = !this.viewBig;
+  }
+
+  getCurrentView(): boolean {
+    return this.viewBig;
+  }
+
+  // меняет тип сортировки
+  changeSort(sortType: number): void {
+    this.sortType = sortType;
+  }
+
+  // возвращает текущий тип сортировки.
+  getCurrentSort(): number {
+    return this.sortType;
+  }
+
+  changeSearch(textSearch: string): void {
+    this.textSearch = textSearch;
+  }
+
+  // возвращает текущий тип сортировки.
+  getCurrentSearch(): string {
+    return this.textSearch;
   }
 
   // отфильтровать переданный массив товаров с учетом указанного фильтра.
@@ -266,16 +446,60 @@ class Model {
     return max ? max : 0;
   }
 
+  // сортировка
+  private sortGoods(currentBase: IProducts): void {
+    switch (this.sortType) {
+      case 0:
+        break;
+      case 1: //1 'Sort by price &uarr;', - от наибольшего к наименьшему.
+        {
+          currentBase.products = currentBase.products.sort((a, b) => b.price - a.price);
+        }
+        break;
+      case 2: //2 'Sort by price &darr;', - от наименьшего к наибольшему.
+        {
+          currentBase.products = currentBase.products.sort((a, b) => a.price - b.price);
+        }
+        break;
+      case 3: //3 'Sort by stock &uarr;', - от наибольшего к наименьшему.
+        {
+          currentBase.products = currentBase.products.sort((a, b) => b.stock - a.stock);
+        }
+        break;
+      case 4: //4 'Sort by stock &darr;', - от наименьшего к наибольшему.
+        {
+          currentBase.products = currentBase.products.sort((a, b) => a.stock - b.stock);
+        }
+        break;
+    }
+  }
+
+  // поиск
+  private filterTextSearch(currentBase: IProducts): void {
+    currentBase.products = currentBase.products.filter((item) => {
+      return [
+        JSON.stringify(item.title).toLowerCase().includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.description).toLowerCase().includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.category).toLowerCase().includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.manufacturer).toLowerCase().includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.gender).toLowerCase().includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.price).toLowerCase().includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.discountPercentage)
+          .toLowerCase()
+          .includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.rating).toLowerCase().includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.stock).toLowerCase().includes(this.textSearch.toLowerCase()),
+        JSON.stringify(item.color).toLowerCase().includes(this.textSearch.toLowerCase()),
+      ].some((element) => element);
+    });
+  }
+
   // получение отфильтрованного списка товаров
   getGoods(): IProducts {
     // copy all goods.
     const tempBase: IProducts = {
       products: this.prodBase.products.map((item) => item),
     };
-
-    // apply sorting.
-
-    // aply text search.
 
     // apply checkbox filter.
     if (this.filter.length) {
@@ -287,11 +511,30 @@ class Model {
     // apply slider filter.
     this.applyFilterSliders(tempBase);
 
+    // apply sorting.
+    this.sortGoods(tempBase);
+
+    // aply text search.
+    this.filterTextSearch(tempBase);
+
     return tempBase;
+  }
+
+  // получение списка товаров по id
+  getGoodsByIPs(IPs: Array<string>): IProducts {
+    const tempBase: IProducts = {
+      products: this.prodBase.products.filter((item) => IPs.includes(String(item.id))),
+    };
+    return tempBase;
+  }
+
+  changeHashCart(page: number, limit: number) {
+    window.location.hash = `#/cart?page=${page}&limit=${limit}`;
   }
 
   run(): void {
     // this.view.render(this);
+    this.loadLocalStoreage();
   }
 }
 
