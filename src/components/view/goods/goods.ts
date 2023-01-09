@@ -70,12 +70,20 @@ class ViewGoods {
 
     addToCart.addEventListener('click', () => {
       model.addCart(item.id);
+
+      if (model.isIDInCart(item.id)) {
+        addToCart.textContent = 'DROP FROM CART';
+      } else {
+        addToCart.textContent = 'ADD TO CART';
+      }
     });
 
     const buyNow = createElement('div', 'goods__cart__buy-btn', cart);
     buyNow.textContent = 'BUY NOW';
     buyNow.addEventListener('click', () => {
-      model.addCart(item.id);
+      if (model.isIDInCart(item.id) === false) {
+        model.addCart(item.id);
+      }
       document.location.hash = '#/cart';
     });
   }
