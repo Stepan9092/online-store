@@ -2,19 +2,28 @@ import Model from '../model/model';
 import ViewMain from '../view/main/index';
 import ViewCart from '../view/cart/cart';
 import ViewError from '../view/error/404';
+import ViewGods from '../view/goods/goods';
 import { IPage, IParametr } from '../types/index';
 
 class Controller {
   private view: ViewMain;
   private viewCart: ViewCart;
+  private viewGods: ViewGods;
   private error: ViewError;
   private model: Model;
   private validPage: Array<IPage>;
 
-  constructor(view: ViewMain, model: Model, viewCart: ViewCart, error: ViewError) {
+  constructor(
+    view: ViewMain,
+    model: Model,
+    viewCart: ViewCart,
+    error: ViewError,
+    viewGoods: ViewGods
+  ) {
     this.model = model;
     this.view = view;
     this.viewCart = viewCart;
+    this.viewGods = viewGoods;
     this.error = error;
 
     // описание валидных страниц и их параметров.
@@ -25,7 +34,7 @@ class Controller {
     });
     this.validPage.push({
       page: 'goods',
-      params: [],
+      params: ['id'],
     });
     this.validPage.push({
       page: 'cart',
@@ -119,6 +128,10 @@ class Controller {
       }
 
       if (page === 'cart') {
+        this.viewCart.render(validParams);
+      }
+
+      if (page === 'goods') {
         this.viewCart.render(validParams);
       }
     } else {
