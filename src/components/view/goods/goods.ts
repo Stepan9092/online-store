@@ -71,7 +71,13 @@ class ViewGoods {
     addToCart.addEventListener('click', () => {
       model.addCart(item.id);
     });
-    createElement('div', 'goods__cart__buy-btn', cart).textContent = 'BUY NOW';
+
+    const buyNow = createElement('div', 'goods__cart__buy-btn', cart);
+    buyNow.textContent = 'BUY NOW';
+    buyNow.addEventListener('click', () => {
+      model.addCart(item.id);
+      document.location.hash = '#/cart';
+    });
   }
 
   render(item: IProduct, model: Model): void {
