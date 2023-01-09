@@ -37,7 +37,7 @@ class ViewCart {
     const isValidPhone = this.isValidGenerate('.app-modal__item-phone', /^\+[0-9]{9,15}$/, 'error');
     const isValidAddress = this.isValidGenerate(
       '.app-modal__item-address',
-      /^[\S]{5,24} *[\S]{5,24} *[\S]{5,24}$/,
+      /^[\S]{5,24} *[\S]{5,24} *[\S]{5,24}/,
       'error'
     );
     const isValidEmail = this.isValidGenerate(
