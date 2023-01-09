@@ -15,7 +15,6 @@
 			"color": "grey",
 			"thumbnail": "./data/products/1/thumbnail.webp",
 			"images": [
-				"./data/products/1/1.webp",
 				"./data/products/1/2.webp",
 				"./data/products/1/3.webp",
 				"./data/products/1/4.webp",
@@ -62,7 +61,6 @@
 			"thumbnail": "./data/products/3/thumbnail.webp",
 			"images": [
 				"./data/products/3/1.webp",
-				"./data/products/3/2.webp",
 				"./data/products/3/3.webp",
 				"./data/products/3/4.webp",
 				"./data/products/3/thumbnail.webp"
@@ -450,7 +448,6 @@
 			"thumbnail": "./data/products/20/thumbnail.webp",
 			"images": [
 				"./data/products/20/1.webp",
-				"./data/products/20/2.webp",
 				"./data/products/20/3.webp",
 				"./data/products/20/4.webp",
 				"./data/products/20/5.webp",

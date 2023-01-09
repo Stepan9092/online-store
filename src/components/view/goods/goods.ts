@@ -10,8 +10,7 @@ class ViewGoods {
   }
 
   testText(parrent: HTMLElement, item: IProduct): void {
-    //createElement('h1', '', parrent).textContent = 'GOODS';
-    //createElement('h2', '', parrent).textContent = `GOODS ID ${String(id)}`;
+    // image
     console.log(item);
     const nav = createElement('div', 'goods__navigation', parrent);
     nav.textContent = `${item.gender} / ${item.category} / ${item.manufacturer} / ${item.title}`;
@@ -30,16 +29,39 @@ class ViewGoods {
       ['src', item.thumbnail]
     );
     item.images.forEach((itemImage) => {
-      const photoImage = createElement(
+      const previewImage = createElement(
         'img',
         'goods__photo-preview_image',
         photoPreview,
-        ['alt', 'goods image'],
+        ['alt', 'goods image preview'],
         ['src', itemImage]
       );
+
+      previewImage.addEventListener('click', () => {
+        photoImage.setAttribute('src', itemImage);
+      });
     });
-    createElement('div', 'goods__info', discription);
-    createElement('div', 'goods__cart', discription);
+
+    // info
+    const info = createElement('div', 'goods__info', discription);
+    createElement('div', 'goods__info-caption', info).textContent = 'Description:';
+    createElement('div', 'goods__info-value', info).textContent = item.description;
+    createElement('div', 'goods__info-caption', info).textContent = 'Discount Percentage:';
+    createElement('div', 'goods__info-value', info).textContent = '' + item.discountPercentage;
+    createElement('div', 'goods__info-caption', info).textContent = 'Rating:';
+    createElement('div', 'goods__info-value', info).textContent = '' + item.rating;
+    createElement('div', 'goods__info-caption', info).textContent = 'Stock:';
+    createElement('div', 'goods__info-value', info).textContent = '' + item.stock;
+    createElement('div', 'goods__info-caption', info).textContent = 'Brand:';
+    createElement('div', 'goods__info-value', info).textContent = '' + item.manufacturer;
+    createElement('div', 'goods__info-caption', info).textContent = 'Category:';
+    createElement('div', 'goods__info-value', info).textContent = '' + item.category;
+
+    // cart
+    const cart = createElement('div', 'goods__cart', discription);
+    createElement('div', 'goods__cart-price', cart).textContent = `${item.price} $`;
+    createElement('div', 'goods__cart__add-btn', cart).textContent = 'ADD TO CART';
+    createElement('div', 'goods__cart__buy-btn', cart).textContent = 'BUY NOW';
   }
 
   render(item: IProduct): void {
