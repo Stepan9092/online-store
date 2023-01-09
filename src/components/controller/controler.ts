@@ -1,18 +1,21 @@
 import Model from '../model/model';
 import ViewMain from '../view/main/index';
 import ViewCart from '../view/cart/cart';
+import ViewError from '../view/error/404';
 import { IPage, IParametr } from '../types/index';
 
 class Controller {
   private view: ViewMain;
   private viewCart: ViewCart;
+  private error: ViewError;
   private model: Model;
   private validPage: Array<IPage>;
 
-  constructor(view: ViewMain, model: Model, viewCart: ViewCart) {
+  constructor(view: ViewMain, model: Model, viewCart: ViewCart, error: ViewError) {
     this.model = model;
     this.view = view;
     this.viewCart = viewCart;
+    this.error = error;
 
     // описание валидных страниц и их параметров.
     this.validPage = new Array<IPage>();
@@ -121,6 +124,7 @@ class Controller {
     } else {
       // render 404
       console.log('RENDER 404');
+      this.error.render();
     }
   }
 
