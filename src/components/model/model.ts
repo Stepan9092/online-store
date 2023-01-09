@@ -1,8 +1,10 @@
 import base from '../model/products.json';
 import ViewMain from '../view/main/index';
+import Header from '../view/header/header';
 import { IProduct, IProducts, IFilterItems, IFilterItemSlider, ICartBase } from '../types/index';
 
 class Model {
+  private header: Header;
   private view: ViewMain;
   private prodBase: IProducts;
   private filter: Array<IFilterItems>;
@@ -21,17 +23,37 @@ class Model {
 
   private cart: Array<ICartBase>;
 
-  constructor(view: ViewMain) {
+  constructor(view: ViewMain, header: Header) {
     this.view = view;
     this.prodBase = base;
     this.filter = new Array<IFilterItems>();
     this.cart = [];
+    this.header = header;
   }
 
   //! Методы для работы с корзиной!
 
   getCart() {
     return this.cart;
+  }
+
+  getCartCount(): string {
+    return String(this.cart.length);
+  }
+
+  getCartTotal(): string {
+    return String(
+      this.cart
+        .map((item) => {
+          if (this.getGoodsByID(item.id).products[0]) {
+            return this.getGoodsByID(item.id).products[0].price;
+          } else {
+            return 0;
+          }
+        })
+        .reduce((acc, item) => (acc = acc + item), 0)
+        .toFixed(2)
+    );
   }
 
   loadLocalStoreage(): void {
@@ -58,6 +80,9 @@ class Model {
         count: 1,
       });
     }
+
+    this.header.changeSumHeader(this.getCartTotal());
+    this.header.changeBasketAmount(this.getCartCount());
   }
 
   // removeCart(id: number): void {

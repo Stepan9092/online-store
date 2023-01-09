@@ -9,12 +9,12 @@ class Header {
     this.container = document.querySelector('header');
   }
 
-  run(): void {
-    this.createHeader();
+  run(total: string, count: string): void {
+    this.createHeader(total, count);
     this.onClickBasket();
   }
 
-  createHeader() {
+  createHeader(total: string, count: string) {
     this.container?.classList.add('header');
     const wrapper = createElement('div', 'header-wrapper', this.container);
     const logo = createElement('div', 'header__logo', wrapper);
@@ -24,7 +24,7 @@ class Header {
     const sumText = createElement('span', 'header__sumText', sum);
     sumText.innerText = 'Cart total: ';
     const sumAmount = createElement('span', 'header__sumAmount', sum);
-    sumAmount.innerText = '0';
+    sumAmount.innerText = `${total} $`;
     const basket = createElement('div', 'header__basket', wrapper);
     createElement(
       'img',
@@ -35,7 +35,7 @@ class Header {
     );
 
     const basketAmount = createElement('span', 'header__basketAmount', basket);
-    basketAmount.innerText = '0';
+    basketAmount.innerText = count;
   }
 
   onClickBasket() {
@@ -44,14 +44,14 @@ class Header {
     });
   }
 
-  static changeSumHeader(sum: string) {
+  changeSumHeader(sum: string) {
     const sumEl = document.querySelector('.header__sumAmount') as HTMLElement;
     if (sumEl) {
-      sumEl.innerText = sum;
+      sumEl.innerText = `${sum} $`;
     }
   }
 
-  static changeBasketAmount(num: string) {
+  changeBasketAmount(num: string) {
     const basketAmount = document.querySelector('.header__basketAmount') as HTMLElement;
     if (basketAmount) {
       basketAmount.innerText = num;
