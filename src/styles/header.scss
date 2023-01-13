@@ -1,0 +1,59 @@
+$colorText: rgb(255, 255, 255);
+$colorPhone: #131921;
+
+.header{
+  font-family: 'Amazon Ember';
+  background-color: $colorPhone;
+  height: 60px;
+}
+
+.header-wrapper{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 60px;
+  margin: 0 30px;
+}
+
+.header__img{
+  height: 50px;
+}
+
+.header__sum{
+  font-size: 20px;
+  color: $colorText;
+}
+
+.header__basket{
+  cursor: pointer;
+  position: relative;
+}
+
+.header__basketAmount{
+  font-size: 14px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 2px;
+  left: 30px;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  background-color: rgb(255, 255, 255);
+}
+
+.header__basketImage{
+  height: 50px;
+}
+
+@media (max-width: 460px){
+
+  .header-wrapper{
+    margin: 0 10px;
+  }
+  
+  .header__img{
+    height: 40px;
+  }
+}

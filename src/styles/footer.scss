@@ -1,0 +1,39 @@
+$colorText: rgb(255, 255, 255);
+$colorPhone: #131921;
+
+.footer{
+  font-family: 'Amazon Ember';
+  height: 60px;
+  background-color: $colorPhone;
+}
+
+.footer-wrapper{
+  height: 60px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.footer__link{
+  text-decoration: none;
+  display: flex;
+  align-self: center;
+}
+
+.github__image{
+  height: 25px;
+}
+
+.github__name{
+  font-size: 13px;
+  color: $colorText;
+  margin-left: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer__text{
+  color: $colorText;
+  font-size: 20px;
+}
