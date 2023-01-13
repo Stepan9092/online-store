@@ -46,8 +46,9 @@ class Model {
     return String(
       this.cart
         .map((item) => {
-          if (this.getGoodsByID(item.id).products[0]) {
-            return this.getGoodsByID(item.id).products[0].price * item.count;
+          const product = this.getGoodsByID(item.id).products[0];
+          if (product) {
+            return (product.price * item.count * (100 - product.discountPercentage)) / 100;
           } else {
             return 0;
           }
@@ -521,7 +522,7 @@ class Model {
   }
 
   // получение списка товаров по id
-  getGoodsByIPs(IPs: Array<string>): IProducts {
+  getGoodsByIDs(IPs: Array<string>): IProducts {
     const tempBase: IProducts = {
       products: this.prodBase.products.filter((item) => IPs.includes(String(item.id))),
     };
